@@ -1,7 +1,6 @@
-import java.io.DataOutputStream;
+import controller.ResourceController;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -10,8 +9,13 @@ import java.util.concurrent.ForkJoinPool;
 public class Server {
     private static final Socket UNBOUNDED = null;
 
+    private final ResourceController resourceController = createResourceController();
     private final ServerSocket serverSocket = createServerSocket();
     private final ExecutorService executorService = ForkJoinPool.commonPool();
+
+    public ResourceController createResourceController(){
+        return new ResourceController();
+    }
 
     public ServerSocket createServerSocket() {
         try {
@@ -30,7 +34,7 @@ public class Server {
                 System.out.println("accept.. request");
                 System.out.printf("New Client Connect! Connected IP : %s, Port : %d\n", socket.getInetAddress(), socket.getPort());
 
-                executorService.submit(new Responser(socket.getInputStream(), socket.getOutputStream()));
+                executorService.submit(new Receiver(socket.getInputStream(), socket.getOutputStream(), resourceController));
 
                 socket = UNBOUNDED;
             }
