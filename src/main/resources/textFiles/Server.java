@@ -8,10 +8,14 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Server {
     private static final Socket UNBOUNDED = null;
-    public final ResourceController resourceController = createResourceController();
 
+    private final ResourceController resourceController = createResourceController();
     private final ServerSocket serverSocket = createServerSocket();
     private final ExecutorService executorService = ForkJoinPool.commonPool();
+
+    public ResourceController createResourceController(){
+        return new ResourceController();
+    }
 
     public ServerSocket createServerSocket() {
         try {
@@ -19,13 +23,6 @@ public class Server {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private ResourceController createResourceController(){
-        if(resourceController == null){
-            return new ResourceController();
-        }
-        return null;
     }
 
     public void start(){
