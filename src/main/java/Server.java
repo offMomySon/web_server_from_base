@@ -43,7 +43,7 @@ public class Server {
             }
         } catch (IOException e) {
             e.printStackTrace();
-
+        } finally {
             try {
                 if(socket != null) socket.close();
             } catch (IOException ioException) {
