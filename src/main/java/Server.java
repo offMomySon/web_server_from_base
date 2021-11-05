@@ -37,7 +37,7 @@ public class Server {
                 System.out.println("accept.. request");
                 System.out.printf("New Client Connect! Connected IP : %s, Port : %d\n", socket.getInetAddress(), socket.getPort());
 
-                executorService.submit(new Receiver(socket.getInputStream(), socket.getOutputStream(), resourceController));
+                executorService.submit(new Servlet(socket.getInputStream(), socket.getOutputStream(), resourceController));
 
                 socket = UNBOUNDED;
             }
