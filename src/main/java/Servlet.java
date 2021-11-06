@@ -1,11 +1,17 @@
 import controller.ResourceController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reader.MessageReader;
 import sender.MessageSender;
 import status.ResourceStatus;
 
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 
 public class Servlet implements Runnable{
+    private static final Logger logger =
+            LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final ResourceController resourceController;
     private final MessageReader messageReader;
     private final MessageSender messageSender;
@@ -26,7 +32,7 @@ public class Servlet implements Runnable{
 
             messageSender.sendResponse(filePath,resourceStatus);
         } catch (IOException e) {
-            System.out.println("some");
+            logger.error("Exception happen", e);
             e.printStackTrace();
         }
     }

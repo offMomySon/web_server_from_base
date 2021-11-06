@@ -1,6 +1,9 @@
 import controller.ResourceController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -8,8 +11,10 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Server {
     private static final Socket UNBOUNDED = null;
-    public final ResourceController resourceController = createResourceController();
+    private static final Logger logger =
+            LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    public final ResourceController resourceController = createResourceController();
     private final ServerSocket serverSocket = createServerSocket();
     private final ExecutorService executorService = ForkJoinPool.commonPool();
 
@@ -32,10 +37,11 @@ public class Server {
         Socket socket = UNBOUNDED;
         try {
             while(true){
-                System.out.println("waiting.. request");
+                logger.info("waiting.. request");
                 socket = serverSocket.accept();
-                System.out.println("accept.. request");
-                System.out.printf("New Client Connect! Connected IP : %s, Port : %d\n", socket.getInetAddress(), socket.getPort());
+
+                logger.info("accept.. request");
+                logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(), socket.getPort());
 
                 executorService.submit(new Servlet(socket.getInputStream(), socket.getOutputStream(), resourceController));
 

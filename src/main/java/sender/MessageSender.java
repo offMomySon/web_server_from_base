@@ -1,14 +1,20 @@
 package sender;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import status.ResourceStatus;
 
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
 public class MessageSender {
     private final static String DEFAULT_CONTENT_TYPE = "text/html";
+    private static final Logger logger =
+            LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final OutputStream outputStream;
 
     public MessageSender(OutputStream outputStream) {
@@ -29,7 +35,7 @@ public class MessageSender {
     }
 
     private void sendExistFileResponse(String filePath){
-        System.out.println("this is file.");
+        logger.info("Start to response exist file.");
 
         try {
             File file = new File(filePath);
@@ -41,23 +47,23 @@ public class MessageSender {
 
             outputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
-            System.out.println("flushed..");
+
+            logger.info("Finish to response exit file.");
         }catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void sendDirectoryResponse(String filePath){
-        System.out.println("curDirFilesBuilder start");
-
+        logger.info("Start to response directory info.");
         File file = new File(filePath);
 
         StringBuilder curDirFilesBuilder = new StringBuilder();
         curDirFilesBuilder.append("this is file/dir list</br>");
         for(File curDirFile : Objects.requireNonNull(file.listFiles())){
             curDirFilesBuilder.append("/").append(curDirFile.getName()).append("</br>");
-            System.out.println(curDirFilesBuilder);
         }
+        logger.info("Result of file/dir list [{}]", curDirFilesBuilder.toString());
 
         try {
             String responseMsg = createHeader(curDirFilesBuilder.toString().length(), DEFAULT_CONTENT_TYPE);
@@ -65,6 +71,8 @@ public class MessageSender {
 
             outputStream.write(responseMsg.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
+
+            logger.info("Finish to response directory info.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,6 +80,8 @@ public class MessageSender {
 
     private void sendFileNotExistResponse(){
         try {
+            logger.info("Start to response file not exist info.");
+
             String notExistErrMsg = "File/Directory not exist";
 
             String responseMsg = createHeader(notExistErrMsg.length(), DEFAULT_CONTENT_TYPE);
@@ -79,6 +89,8 @@ public class MessageSender {
 
             outputStream.write(responseMsg.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
+
+            logger.info("Finish to response file not exist info.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -86,21 +98,21 @@ public class MessageSender {
 
 
     private void outputFile(String filePath, OutputStream outputStream){
-        System.out.println("star readFile");
+        logger.info("Start to response file at http body.");
 
         try(FileInputStream fileInputStream = new FileInputStream(filePath)) {
             byte[] buffer = new byte[8192];
             int readNo = -1;
 
             while((readNo = fileInputStream.read(buffer)) != -1) {
-                System.out.println("loop read..");
+                logger.debug("File binary read looping.. path[{}]", filePath);
                 outputStream.write(buffer,0,readNo);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        System.out.println("end readFile..");
+        logger.info("Finish readFile.");
     }
 
     private String createHeader(long contentLength, String contentType ){
@@ -113,6 +125,8 @@ public class MessageSender {
     }
 
     private String getContentType(String path){
+        logger.info("Guess content type.");
+
         if (path.endsWith(".html") || path.endsWith(".htm"))
             return "text/html";
         else if (path.endsWith(".txt") || path.endsWith(".java"))
