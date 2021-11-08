@@ -1,4 +1,4 @@
-import controller.ResourceController;
+import resource.ResourceController;
 
 import java.io.IOException;
 import java.net.ServerSocket;
