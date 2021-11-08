@@ -1,8 +1,7 @@
-package controller;
+package resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import status.ResourceStatus;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;

@@ -1,9 +1,9 @@
-import controller.ResourceController;
+import resource.ResourceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reader.MessageReader;
 import sender.MessageSender;
-import status.ResourceStatus;
+import resource.ResourceStatus;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;

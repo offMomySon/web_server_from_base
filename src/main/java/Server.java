@@ -1,4 +1,4 @@
-import controller.ResourceController;
+import resource.ResourceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,23 +14,26 @@ public class Server {
     private static final Logger logger =
             LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public final ResourceController resourceController = createResourceController();
-    private final ServerSocket serverSocket = createServerSocket();
-    private final ExecutorService executorService = ForkJoinPool.commonPool();
+    private final ResourceController resourceController;
+    private final ServerSocket serverSocket;
+    private final ExecutorService executorService;
+    
+    public Server() {
+        resourceController = createResourceManager();
+        serverSocket = createServerSocket(5001);
+        executorService = ForkJoinPool.commonPool();
+    }
 
-    public ServerSocket createServerSocket() {
+    public static ServerSocket createServerSocket(int port) {
         try {
-            return new ServerSocket(5001);
+            return new ServerSocket(port);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private ResourceController createResourceController(){
-        if(resourceController == null){
-            return new ResourceController();
-        }
-        return null;
+    private static ResourceController createResourceManager(){
+        return new ResourceController();
     }
 
     public void start(){
