@@ -41,6 +41,7 @@ public class MessageReader {
                 break;
             }
         }
+        System.out.println(httpRequestMessage.toString());
         return httpRequestMessage.toString();
     }
 
