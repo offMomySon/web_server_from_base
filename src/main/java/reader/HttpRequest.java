@@ -2,43 +2,54 @@ package reader;
 
 import httpspec.HttpMethod;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.util.Set;
+import util.IoUtil;
 
 public class HttpRequest {
-    HttpStartLine httpStartLine;
-    HttpHeader httpHeader;
 
-    public HttpRequest(InputStream inputStream) {
-        httpStartLine = new HttpStartLine(inputStream);
-        httpHeader = new HttpHeader(inputStream);
-    }
+  HttpStartLine httpStartLine;
+  HttpHeader httpHeader;
+  HttpBody httpBody;
 
-    public HttpMethod getHttpMethod(){
-        return httpStartLine.getHttpMethod();
-    }
+  public HttpRequest(InputStream inputStream) {
+    BufferedReader reader = IoUtil.createReader(inputStream);
 
-    public String getRequestTarget(){
-        return httpStartLine.getRequestTarget();
-    }
+    httpStartLine = new HttpStartLine(reader);
+    httpHeader = new HttpHeader(reader);
+    httpBody = new HttpBody(reader);
+  }
 
-    public String getRequestVersion(){
-        return httpStartLine.getHttpVersion();
-    }
+  public HttpMethod getHttpMethod() {
+    return httpStartLine.getHttpMethod();
+  }
 
-    public String getHeaderValue(String key){
-        return httpHeader.getValue(key);
-    }
+  public String getBody() {
+    return httpBody.getBody();
+  }
 
-    public Set<String> headerKeySet(){
-        return httpHeader.keySet();
-    }
+  public String getRequestTarget() {
+    return httpStartLine.getRequestTarget();
+  }
 
-    public boolean headerContainKey(String key){
-        return httpHeader.containKey(key);
-    }
+  public String getRequestVersion() {
+    return httpStartLine.getHttpVersion();
+  }
 
-    public String getValue(String key){
-        return httpHeader.getValue(key);
-    }
+  public String getHeaderValue(String key) {
+    return httpHeader.getValue(key);
+  }
+
+  public Set<String> headerKeySet() {
+    return httpHeader.keySet();
+  }
+
+  public boolean headerContainKey(String key) {
+    return httpHeader.containKey(key);
+  }
+
+  public String getValue(String key) {
+    return httpHeader.getValue(key);
+  }
 }
