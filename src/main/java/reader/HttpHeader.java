@@ -14,42 +14,43 @@ import java.util.Set;
 import static util.IoUtil.*;
 
 public class HttpHeader {
-    private final Map<String, String> header = new HashMap<>();
-    private static final Logger logger =
-            LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public HttpHeader(InputStream inputStream) {
-        BufferedReader reader = createReader(inputStream);
+  private final Map<String, String> header = new HashMap<>();
+  private static final Logger logger =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-        try {
-            logger.info("start logging header");
-            while(true){
-                String headerLine = reader.readLine();
-                logger.info(headerLine);
+  public HttpHeader(BufferedReader reader) {
+    try {
+      logger.info("ready get http header");
+      while (true) {
+        logger.info("looping..");
+        String headerLine = reader.readLine();
+        logger.info(headerLine);
 
-                if(headerLine.length() == 0){
-                    break;
-                }
-
-                String[] headerPart = headerLine.split(":",2);
-                if(headerPart.length == 2){
-                    header.put(headerPart[0].trim(), headerPart[1].trim());
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (headerLine.length() == 0) {
+          break;
         }
-    }
 
-    public Set<String> keySet(){
-        return header.keySet();
+        String[] headerPart = headerLine.split(":", 2);
+        if (headerPart.length == 2) {
+          header.put(headerPart[0].trim(), headerPart[1].trim());
+        }
+      }
+      logger.info("result of http header == \n" + header);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public boolean containKey(String key){
-        return header.containsKey(key);
-    }
+  public Set<String> keySet() {
+    return header.keySet();
+  }
 
-    public String getValue(String key){
-        return header.get(key);
-    }
+  public boolean containKey(String key) {
+    return header.containsKey(key);
+  }
+
+  public String getValue(String key) {
+    return header.get(key);
+  }
 }
