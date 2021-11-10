@@ -21,22 +21,24 @@ public class HttpHeader {
 
   public HttpHeader(BufferedReader reader) {
     try {
-      logger.info("ready get http header");
-      while (true) {
-        logger.info("looping..");
-        String headerLine = reader.readLine();
-        logger.info(headerLine);
+      String headerLine = null;
+      logger.info("Ready to get http header");
+      while ((headerLine = reader.readLine()) != null && (headerLine.length() != 0)) {
+        logger.debug("Loop.. get http header");
+        logger.debug(headerLine);
 
-        if (headerLine.length() == 0) {
-          break;
+        String key = headerLine.split(":", 2)[0].trim();
+        String value = headerLine.split(":", 2)[1].trim();
+
+        if (key.length() == 0) {
+          throw new IllegalArgumentException("key is empty value.");
+        } else if (value.length() == 0) {
+          throw new IllegalArgumentException("value is empty value.");
         }
 
-        String[] headerPart = headerLine.split(":", 2);
-        if (headerPart.length == 2) {
-          header.put(headerPart[0].trim(), headerPart[1].trim());
-        }
+        header.put(key, value);
       }
-      logger.info("result of http header == \n" + header);
+      logger.info("Result of http header == \n" + header);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -21,16 +21,17 @@ public class HttpStartLine {
 
   public HttpStartLine(BufferedReader reader) {
     try {
-      logger.info("read get startLine");
+      logger.info("Read get startLine");
       String startLine = reader.readLine();
-      logger.info("startLine : " + startLine);
+      logger.info("StartLine : " + startLine);
 
       httpMethod = HttpMethod.valueOf(startLine.split(" ")[0]);
-      logger.info("startLine : " + httpMethod);
       requestTarget = startLine.split(" ")[1];
-      logger.info("startLine : " + requestTarget);
       httpVersion = startLine.split(" ")[2];
-      logger.info("startLine : " + httpVersion);
+
+      logger.debug("HttpMethod : " + httpMethod);
+      logger.debug("RequestTarget : " + requestTarget);
+      logger.debug("HttpVersion : " + httpVersion);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
