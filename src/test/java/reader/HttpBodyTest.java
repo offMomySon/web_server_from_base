@@ -11,23 +11,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class HttpBodyTest {
 
-  @DisplayName("Body 를 올바르게 가져오고 종되어야 한다.")
+  @DisplayName("Body 를 올바르게 가져와야 한다.")
   @ParameterizedTest
   @MethodSource("provideHttpBodyAndExpect")
   void getHttpBodyTest(String testBody, String expect) {
     //given
-    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-        testBody.getBytes(StandardCharsets.UTF_8));
     BufferedReader bufferedReader = new BufferedReader(
-        new InputStreamReader(new BufferedInputStream(byteArrayInputStream)));
-    HttpBody httpBody = new HttpBody(bufferedReader);
+        new InputStreamReader(new BufferedInputStream(
+            new ByteArrayInputStream(testBody.getBytes(StandardCharsets.UTF_8)))));
+    HttpBody httpBody = new HttpBody(bufferedReader, testBody.length());
 
     //when
     String actualBody = httpBody.getBody();
@@ -45,11 +41,11 @@ class HttpBodyTest {
         "'Email':'test@naver.com'\n" +
         "}";
     String expect = "{" +
-        "'FirstName':'value'," +
-        "'LastName':'last'," +
-        "'UserName':'name'," +
-        "'Password':'passw'," +
-        "'Email':'test@naver.com'" +
+        "'FirstName':'value',\n" +
+        "'LastName':'last',\n" +
+        "'UserName':'name',\n" +
+        "'Password':'passw',\n" +
+        "'Email':'test@naver.com'\n" +
         "}";
     return Stream.of(Arguments.of(provide, expect));
   }

@@ -30,12 +30,7 @@ public class ResourceController {
     return ResourceStatus.PATH_NOT_EXIST;
   }
 
-  public String getFilePath(String httpRequestMessage) {
-    logger.debug("Try to extract url path from http request header.");
-
-    String path = httpRequestMessage.split(" ")[1];
-    logger.debug("URL PATH : {}", path);
-
-    return RESOURCE_ROOT_PATH + path;
+  public String getFilePath(String requestTarget) {
+    return RESOURCE_ROOT_PATH + requestTarget;
   }
 }

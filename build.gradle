@@ -31,7 +31,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
-
 }
 
 test {
