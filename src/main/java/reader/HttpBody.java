@@ -13,6 +13,7 @@ public class HttpBody {
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final StringBuilder bodyStringBuilder = new StringBuilder();
+  private final String body;
   private final char[] charBuffer = new char[8192];
 
   public HttpBody(BufferedReader reader, int contentLength) {
@@ -23,7 +24,6 @@ public class HttpBody {
       logger.info("Ready to get http body ");
       while ((bytesRead = reader.read(charBuffer)) > 0) {
         logger.debug("Loop.. get http body");
-        logger.debug(new String(charBuffer, 0, bytesRead));
 
         bodyStringBuilder.append(charBuffer, 0, bytesRead);
 
@@ -35,9 +35,10 @@ public class HttpBody {
         }
       }
 
-      logger.info("End http body read \n == Result body == \n" + bodyStringBuilder.toString());
+      body = bodyStringBuilder.toString();
+      logger.info("End http body read \n == Result body == \n" + body);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 

@@ -1,0 +1,30 @@
+{
+  "downloadPath": "src/main/resources/files",
+  "period": 1,
+  "count": 1,
+  "restrictedFileExtension": [
+    ".jpg",
+    ".class"
+  ],
+  "restrictedFileExtensionAtIps": [
+    {
+      "ip": "192.168.0.1",
+      "restrictedFileExtension": [
+        ".jpg"
+      ]
+    },
+    {
+      "ip": "192.168.0.2",
+      "restrictedFileExtension": [
+        ".class"
+      ]
+    }
+  ],
+  "periodCountConfigAtIps": [
+    {
+      "ip": "192.168.0.1",
+      "period": 1,
+      "count": 1
+    }
+  ]
+}

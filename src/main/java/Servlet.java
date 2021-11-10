@@ -1,13 +1,13 @@
-import reader.HttpRequest;
-import resource.ResourceController;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reader.MessageReader;
-import sender.MessageSender;
+import reader.HttpRequest;
+import resource.ResourceController;
 import resource.ResourceStatus;
-
-import java.io.*;
-import java.lang.invoke.MethodHandles;
+import sender.MessageSender;
 
 public class Servlet implements Runnable {
 
@@ -20,7 +20,7 @@ public class Servlet implements Runnable {
 
   public Servlet(InputStream inputStream, OutputStream outputStream,
       ResourceController resourceController) {
-    this.resourceController = new ResourceController();
+    this.resourceController = resourceController;
     this.httpRequest = new HttpRequest(inputStream);
     this.messageSender = new MessageSender(outputStream);
   }
