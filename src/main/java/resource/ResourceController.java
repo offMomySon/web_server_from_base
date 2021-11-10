@@ -25,7 +25,7 @@ public class ResourceController {
         return ResourceStatus.FILE_EXIST;
       }
     }
-
+    
     logger.info("File not exist at filePath[{}]", filePath);
     return ResourceStatus.PATH_NOT_EXIST;
   }

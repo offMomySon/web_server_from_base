@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 
 public class IoUtil {
 
-    public static BufferedReader createReader(InputStream inputStream){
-        return new BufferedReader(new InputStreamReader(new BufferedInputStream(inputStream)));
-    }
+  public static BufferedReader createReader(InputStream inputStream) {
+    return new BufferedReader(new InputStreamReader(new BufferedInputStream(inputStream)));
+  }
 
 }
