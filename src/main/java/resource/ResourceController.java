@@ -8,9 +8,13 @@ import java.lang.invoke.MethodHandles;
 
 public class ResourceController {
 
-  private static final String RESOURCE_ROOT_PATH = "src/main/resources/files";
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private final String resourceRootPath;
+
+  public ResourceController(String resourceRootPath) {
+    this.resourceRootPath = resourceRootPath;
+  }
 
   public ResourceStatus getResourceStatus(String filePath) {
     logger.info("Check resource status by filePath[{}]", filePath);
@@ -25,12 +29,12 @@ public class ResourceController {
         return ResourceStatus.FILE_EXIST;
       }
     }
-    
+
     logger.info("File not exist at filePath[{}]", filePath);
     return ResourceStatus.PATH_NOT_EXIST;
   }
 
   public String getFilePath(String requestTarget) {
-    return RESOURCE_ROOT_PATH + requestTarget;
+    return resourceRootPath + requestTarget;
   }
 }

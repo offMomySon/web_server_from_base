@@ -1,3 +1,4 @@
+import config.ConfigManager;
 import resource.ResourceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +17,20 @@ public class Server {
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final ResourceController resourceController;
+  private final ConfigManager configManager;
   private final ServerSocket serverSocket;
   private final ExecutorService executorService;
 
-  public Server() {
-    resourceController = createResourceManager();
-    serverSocket = createServerSocket(5001);
+  public Server(ConfigManager configManager) {
+    this.configManager = configManager;
+
+    resourceController = createResourceManager(configManager.getDownloadPath());
+    serverSocket = createServerSocket(configManager.getPort());
+
     executorService = ForkJoinPool.commonPool();
   }
 
-  public static ServerSocket createServerSocket(int port) {
+  private static ServerSocket createServerSocket(int port) {
     try {
       return new ServerSocket(port);
     } catch (IOException e) {
@@ -33,8 +38,8 @@ public class Server {
     }
   }
 
-  private static ResourceController createResourceManager() {
-    return new ResourceController();
+  private static ResourceController createResourceManager(String resourceRootPath) {
+    return new ResourceController(resourceRootPath);
   }
 
   public void start() {
@@ -64,10 +69,5 @@ public class Server {
         ioException.printStackTrace();
       }
     }
-  }
-
-  public static void main(String[] args) {
-    Server server = new Server();
-    server.start();
   }
 }
