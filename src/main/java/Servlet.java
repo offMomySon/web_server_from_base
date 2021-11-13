@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import reader.HttpRequest;
 import resource.ResourceController;
 import resource.ResourceStatus;
-import sender.MessageSender;
+import sender.MessageManager;
 
 public class Servlet implements Runnable {
 
@@ -16,27 +16,30 @@ public class Servlet implements Runnable {
 
   private final ResourceController resourceController;
   private final HttpRequest httpRequest;
-  private final MessageSender messageSender;
+  private final MessageManager messageManager;
 
   public Servlet(InputStream inputStream, OutputStream outputStream,
       ResourceController resourceController) {
     this.resourceController = resourceController;
     this.httpRequest = new HttpRequest(inputStream);
-    this.messageSender = new MessageSender(outputStream);
+    this.messageManager = new MessageManager(outputStream);
   }
 
   @Override
   public void run() {
+    processMessage();
+  }
+
+  private void processMessage() {
     try {
       String requestTarget = httpRequest.getRequestTarget();
+
       String filePath = resourceController.getFilePath(requestTarget);
+      ResourceStatus resourceStatus = resourceController.getResourceStatus(requestTarget);
 
-      ResourceStatus resourceStatus = resourceController.getResourceStatus(filePath);
-
-      messageSender.sendResponse(filePath, resourceStatus);
+      messageManager.sendMessage(filePath, resourceStatus);
     } catch (IOException e) {
-      logger.error("Exception happen", e);
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 }

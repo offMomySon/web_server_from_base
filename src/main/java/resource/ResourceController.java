@@ -16,8 +16,11 @@ public class ResourceController {
     this.resourceRootPath = resourceRootPath;
   }
 
-  public ResourceStatus getResourceStatus(String filePath) {
-    logger.info("Check resource status by filePath[{}]", filePath);
+  public ResourceStatus getResourceStatus(String requestTarget) {
+    logger.info("Check resource status by requestTarget[{}]", requestTarget);
+
+    String filePath = getFilePath(requestTarget);
+
     File file = new File(filePath);
 
     if (file.exists()) {
