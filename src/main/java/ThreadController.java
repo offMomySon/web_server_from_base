@@ -22,7 +22,7 @@ public class ThreadController {
   private final int usableThreadCount;
   private final int waitableThreadCount;
   private int currentUsingThreadCount = 0;
-  private final int currentWaitThreadCount = 0;
+  private int currentWaitThreadCount = 0;
 
   public ThreadController(ConfigManager configManager) {
     this.executorService = ForkJoinPool.commonPool();
