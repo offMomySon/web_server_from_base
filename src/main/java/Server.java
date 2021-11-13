@@ -1,14 +1,10 @@
 import config.ConfigManager;
-import resource.ResourceController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Server {
 
@@ -16,19 +12,12 @@ public class Server {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final ResourceController resourceController;
-  private final ConfigManager configManager;
   private final ServerSocket serverSocket;
-  private final ExecutorService executorService;
+  private final ThreadController threadController;
 
   public Server(ConfigManager configManager) {
-    this.configManager = configManager;
-
-    resourceController = createResourceManager(configManager.getDownloadPath(),
-        configManager.getWelcomPagePath());
     serverSocket = createServerSocket(configManager.getPort());
-
-    executorService = ForkJoinPool.commonPool();
+    threadController = createThreadController(configManager);
   }
 
   private static ServerSocket createServerSocket(int port) {
@@ -39,9 +28,8 @@ public class Server {
     }
   }
 
-  private static ResourceController createResourceManager(String resourceRootPath,
-      String welcomPagePath) {
-    return new ResourceController(resourceRootPath, welcomPagePath);
+  private static ThreadController createThreadController(ConfigManager configManager) {
+    return new ThreadController(configManager);
   }
 
   public void start() {
@@ -55,9 +43,7 @@ public class Server {
         logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(),
             socket.getPort());
 
-        executorService.submit(
-            new Servlet(socket.getInputStream(), socket.getOutputStream(), resourceController,
-                configManager));
+        threadController.process(socket);
 
         socket = UNBOUNDED;
       }
