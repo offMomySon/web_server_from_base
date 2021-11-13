@@ -12,14 +12,20 @@ public class ResourceController {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private final String resourceRootPath;
+  private final String welcomPageUrl;
   private String filePath;
 
-  public ResourceController(String resourceRootPath) {
+  public ResourceController(String resourceRootPath, String welcomePageUrl) {
     this.resourceRootPath = resourceRootPath;
+    this.welcomPageUrl = welcomePageUrl;
   }
 
   public ResourceStatus getResourceStatus(String requestTarget) {
     logger.info("Check resource status by requestTarget[{}]", requestTarget);
+
+    if (welcomPageUrl.equals(requestTarget)) {
+      return ResourceStatus.WELCOMPAGE;
+    }
 
     File file = new File(getFilePath(requestTarget));
 

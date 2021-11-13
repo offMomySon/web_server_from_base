@@ -24,7 +24,8 @@ public class Server {
   public Server(ConfigManager configManager) {
     this.configManager = configManager;
 
-    resourceController = createResourceManager(configManager.getDownloadPath());
+    resourceController = createResourceManager(configManager.getDownloadPath(),
+        configManager.getWelcomPagePath());
     serverSocket = createServerSocket(configManager.getPort());
 
     executorService = ForkJoinPool.commonPool();
@@ -38,8 +39,9 @@ public class Server {
     }
   }
 
-  private static ResourceController createResourceManager(String resourceRootPath) {
-    return new ResourceController(resourceRootPath);
+  private static ResourceController createResourceManager(String resourceRootPath,
+      String welcomPagePath) {
+    return new ResourceController(resourceRootPath, welcomPagePath);
   }
 
   public void start() {
@@ -54,7 +56,8 @@ public class Server {
             socket.getPort());
 
         executorService.submit(
-            new Servlet(socket.getInputStream(), socket.getOutputStream(), resourceController));
+            new Servlet(socket.getInputStream(), socket.getOutputStream(), resourceController,
+                configManager));
 
         socket = UNBOUNDED;
       }

@@ -17,7 +17,7 @@ class ResourceControllerTest {
   @MethodSource("provideRequestTarget")
   void getFilePathTest(String testTarget, String expect) {
     //given
-    ResourceController resourceController = new ResourceController("");
+    ResourceController resourceController = new ResourceController("", "");
 
     //when
     String actual = resourceController.getFilePath(testTarget);
@@ -39,7 +39,7 @@ class ResourceControllerTest {
   @ValueSource(strings = {"/tmp/../../test", "/tmp/tmp2/../../../test", "/tmp/../.."})
   void getFilePathTest(String testTarget) {
     //given
-    ResourceController resourceController = new ResourceController("");
+    ResourceController resourceController = new ResourceController("", "");
 
     //when
     Throwable throwable = catchThrowable(() -> {
