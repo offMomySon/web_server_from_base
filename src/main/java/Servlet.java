@@ -18,17 +18,33 @@ public class Servlet implements Runnable {
   private final ResourceController resourceController;
   private final HttpRequest httpRequest;
   private final MessageManager messageManager;
+  private final ThreadController threadController;
+  private final OutputStream outputStream;
 
   public Servlet(InputStream inputStream, OutputStream outputStream,
-      ResourceController resourceController, ConfigManager configManager) {
-    this.resourceController = resourceController;
+      ConfigManager configManager, MessageManager messageManager,
+      ThreadController threadController) {
+    this.resourceController = createResourceManager(configManager.getDownloadPath(),
+        configManager.getWelcomPagePath());
+    this.messageManager = messageManager;
+    this.outputStream = outputStream;
+    this.threadController = threadController;
+
     this.httpRequest = new HttpRequest(inputStream);
-    this.messageManager = new MessageManager(outputStream, configManager);
+  }
+
+  private static ResourceController createResourceManager(String resourceRootPath,
+      String welcomPagePath) {
+    return new ResourceController(resourceRootPath, welcomPagePath);
   }
 
   @Override
   public void run() {
+    threadController.waitUntilProcessable();
+
     processRequest();
+
+    threadController.decreaseUsableThread();
   }
 
   private void processRequest() {
@@ -38,7 +54,7 @@ public class Servlet implements Runnable {
       String filePath = resourceController.getFilePath(requestTarget);
       ResourceStatus resourceStatus = resourceController.getResourceStatus(requestTarget);
 
-      messageManager.sendMessage(filePath, resourceStatus);
+      messageManager.sendMessage(filePath, resourceStatus, outputStream);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

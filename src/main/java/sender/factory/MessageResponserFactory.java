@@ -6,6 +6,7 @@ import resource.ResourceStatus;
 import sender.strategy.DirectoryMessageResponser;
 import sender.strategy.FileMessageResponser;
 import sender.strategy.MessageResponser;
+import sender.strategy.NoThreadAvailableMessageResponser;
 import sender.strategy.NotFoundMessageResponser;
 import sender.strategy.WelcomPageMessageResponser;
 
@@ -27,6 +28,9 @@ public class MessageResponserFactory {
         break;
       case WELCOMPAGE:
         messageResponser = new WelcomPageMessageResponser(outputStream, configManager);
+        break;
+      case PROCESSABLE_THREAD_NOT_EXIST:
+        messageResponser = new NoThreadAvailableMessageResponser(outputStream);
     }
 
     return messageResponser;
