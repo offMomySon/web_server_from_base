@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,31 @@ public class ConfigManager {
     return basicConfig.getPort();
   }
 
+  public String getWelcomPagePath() {
+    return basicConfig.getWelcomPagePath();
+  }
+
+  public int getUsableThreadCount() {
+    return threadConfig.getUsableThreadCount();
+  }
+
+  public int getWaitableThreadCount() {
+    return threadConfig.getWaitableThreadCount();
+  }
+
+  public int getDownloadCount() {
+    return downloadConfig.getCount();
+  }
+
   public String getDownloadPath() {
     return downloadConfig.getDownloadPath();
+  }
+
+  public int getDownloadPeriod() {
+    return downloadConfig.getPeriod();
+  }
+
+  public List<String> getRestrictedFileExtension() {
+    return downloadConfig.getRestrictedFileExtension();
   }
 }

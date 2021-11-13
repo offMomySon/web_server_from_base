@@ -1,3 +1,4 @@
+import config.ConfigManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,18 +20,18 @@ public class Servlet implements Runnable {
   private final MessageManager messageManager;
 
   public Servlet(InputStream inputStream, OutputStream outputStream,
-      ResourceController resourceController) {
+      ResourceController resourceController, ConfigManager configManager) {
     this.resourceController = resourceController;
     this.httpRequest = new HttpRequest(inputStream);
-    this.messageManager = new MessageManager(outputStream);
+    this.messageManager = new MessageManager(outputStream, configManager);
   }
 
   @Override
   public void run() {
-    processMessage();
+    processRequest();
   }
 
-  private void processMessage() {
+  private void processRequest() {
     try {
       String requestTarget = httpRequest.getRequestTarget();
 

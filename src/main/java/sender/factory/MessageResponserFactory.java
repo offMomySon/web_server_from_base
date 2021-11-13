@@ -1,16 +1,18 @@
 package sender.factory;
 
+import config.ConfigManager;
 import java.io.OutputStream;
 import resource.ResourceStatus;
 import sender.strategy.DirectoryMessageResponser;
 import sender.strategy.FileMessageResponser;
 import sender.strategy.MessageResponser;
 import sender.strategy.NotFoundMessageResponser;
+import sender.strategy.WelcomPageMessageResponser;
 
 public class MessageResponserFactory {
 
   public static MessageResponser getMessageResponser(OutputStream outputStream,
-      ResourceStatus resourceStatus, String filePath) {
+      ConfigManager configManager, ResourceStatus resourceStatus, String filePath) {
     MessageResponser messageResponser = null;
 
     switch (resourceStatus) {
@@ -22,9 +24,11 @@ public class MessageResponserFactory {
         break;
       case PATH_NOT_EXIST:
         messageResponser = new NotFoundMessageResponser(outputStream);
+        break;
+      case WELCOMPAGE:
+        messageResponser = new WelcomPageMessageResponser(outputStream, configManager);
     }
 
     return messageResponser;
   }
-
 }

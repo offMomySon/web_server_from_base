@@ -1,6 +1,8 @@
 package sender.factory;
 
+import config.ConfigManager;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -12,20 +14,23 @@ import sender.strategy.DirectoryMessageResponser;
 import sender.strategy.FileMessageResponser;
 import sender.strategy.MessageResponser;
 import sender.strategy.NotFoundMessageResponser;
+import sender.strategy.WelcomPageMessageResponser;
 
 class MessageResponserFactoryTest {
 
   @DisplayName("Resource status 에 따라 의도한 MessageResponser 를 생성하는 지 확인.")
   @ParameterizedTest
   @MethodSource("provideResourceStatus")
-  void getMessageREsponser(ResourceStatus resourceStatus, Class<MessageResponser> expect) {
+  void getMessageREsponser(ResourceStatus resourceStatus, Class<MessageResponser> expect)
+      throws FileNotFoundException {
     //given
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     String testFilePath = "test";
 
     //when
     MessageResponser actual = MessageResponserFactory
-        .getMessageResponser(byteArrayOutputStream, resourceStatus, testFilePath);
+        .getMessageResponser(byteArrayOutputStream, new ConfigManager(), resourceStatus,
+            testFilePath);
 
     //then
     Assertions.assertThat(actual).isInstanceOf(expect);
@@ -35,7 +40,8 @@ class MessageResponserFactoryTest {
     return Stream.of(
         Arguments.of(ResourceStatus.PATH_NOT_EXIST, NotFoundMessageResponser.class),
         Arguments.of(ResourceStatus.DIRECTORY_EXIST, DirectoryMessageResponser.class),
-        Arguments.of(ResourceStatus.FILE_EXIST, FileMessageResponser.class)
+        Arguments.of(ResourceStatus.FILE_EXIST, FileMessageResponser.class),
+        Arguments.of(ResourceStatus.WELCOMPAGE, WelcomPageMessageResponser.class)
     );
   }
 }
