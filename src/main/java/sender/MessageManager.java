@@ -15,15 +15,14 @@ public class MessageManager {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final OutputStream outputStream;
   private final ConfigManager configmanager;
 
-  public MessageManager(OutputStream outputStream, ConfigManager configManager) {
-    this.outputStream = outputStream;
+  public MessageManager(ConfigManager configManager) {
     this.configmanager = configManager;
   }
 
-  public void sendMessage(String filePath, ResourceStatus resourceStatus) throws IOException {
+  public void sendMessage(String filePath, ResourceStatus resourceStatus, OutputStream outputStream)
+      throws IOException {
 
     MessageResponser messageResponser = MessageResponserFactory
         .getMessageResponser(outputStream, configmanager, resourceStatus, filePath);
