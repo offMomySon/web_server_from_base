@@ -7,5 +7,4 @@ public class BasicConfig {
 
   private int port;
   private String welcomPagePath;
-
 }
