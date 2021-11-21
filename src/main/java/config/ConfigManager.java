@@ -12,9 +12,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Getter
 public class ConfigManager {
 
   private static final Logger logger =
@@ -49,6 +51,10 @@ public class ConfigManager {
     this.downloadConfig = createDownloadConfig(objectMapper, dataInputStreamOfDownloadConfig);
     logger.info("start createThreadConfig");
     this.threadConfig = createThreadConfig(objectMapper, dataInputStreamOfThreadConfig);
+  }
+
+  public boolean isWelcomePageUri(String uri){
+    return basicConfig.isWelcomePageUri(uri);
   }
 
   private static BasicConfig createBasicConfig(ObjectMapper objectMapper,

@@ -1,37 +1,35 @@
-import static resource.ResourceStatus.PROCESSABLE_THREAD_NOT_EXIST;
-
-import config.ConfigManager;
+import config.server.thread.ThreadConfig;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sender.MessageManager;
+import reader.HttpRequest;
+import sender.factory.AbstractMessageResponserFactory;
+import sender.factory.thread.ThreadStatus;
+import sender.strategy.MessageResponser;
 
-public class ThreadController {
+public class ThreadController implements ThreadStatus {
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final ExecutorService executorService;
-  private final ConfigManager configManager;
-  private final MessageManager messageManager;
 
   private final int usableThreadCount;
   private final int waitableThreadCount;
   private int currentUsingThreadCount = 0;
   private int currentWaitThreadCount = 0;
 
-  public ThreadController(ConfigManager configManager) {
+  public ThreadController(ThreadConfig threadConfig) {
     this.executorService = ForkJoinPool.commonPool();
 
-    this.configManager = configManager;
-    this.usableThreadCount = configManager.getUsableThreadCount();
-    this.waitableThreadCount = configManager.getWaitableThreadCount();
-
-    this.messageManager = new MessageManager(configManager);
+    this.usableThreadCount = threadConfig.getUsableThreadCount();
+    this.waitableThreadCount = threadConfig.getWaitableThreadCount();
   }
 
   private boolean isProcessable() {
@@ -50,7 +48,7 @@ public class ThreadController {
     currentUsingThreadCount += 1;
   }
 
-  public synchronized void decreaseUsableThread() {
+  private synchronized void decreaseUsableThread() {
     currentUsingThreadCount -= 1;
   }
 
@@ -62,7 +60,7 @@ public class ThreadController {
     currentUsingThreadCount -= 1;
   }
 
-  public void waitUntilProcessable() {
+  private void waitUntilProcessable() {
     if (!existUsableThread()) {
       increaseWaitableThread();
 
@@ -77,19 +75,37 @@ public class ThreadController {
     increaseUsableThread();
   }
 
-  public void process(Socket socket) {
+  public void process(Socket socket, AbstractMessageResponserFactory factory) {
+    if(!isProcessable()){
+      return;
+    }
+
     try {
-      if (isProcessable()) {
-        executorService.submit(
-            new Servlet(socket.getInputStream(), socket.getOutputStream(), configManager,
-                messageManager, this));
-      } else {
-        messageManager.sendMessage("", PROCESSABLE_THREAD_NOT_EXIST, socket.getOutputStream());
-      }
+        InputStream inputStream = socket.getInputStream();
+        OutputStream outputStream = socket.getOutputStream();
+
+        executorService.submit(() -> {
+          waitUntilProcessable();
+
+          doSend(inputStream, outputStream, factory);
+
+          decreaseUsableThread();
+        });
     } catch (IOException e) {
       e.printStackTrace();
     }
 
   }
 
+  private static void doSend(InputStream inputStream, OutputStream outputStream, AbstractMessageResponserFactory factory){
+    String requestTarget = new HttpRequest(inputStream).getRequestTarget();
+
+    MessageResponser messageResponser = factory.createMessageResponser(requestTarget);
+    messageResponser.doSend(outputStream);
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return isProcessable();
+  }
 }

@@ -2,18 +2,13 @@ package sender;
 
 import config.ConfigManager;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import resource.ResourceStatus;
-import sender.factory.MessageResponserFactory;
-import sender.strategy.MessageResponser;
+import sender.factory.thread.ThreadStatus;
 
 public class MessageManager {
-
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final ConfigManager configmanager;
 
@@ -21,13 +16,17 @@ public class MessageManager {
     this.configmanager = configManager;
   }
 
-  public void sendMessage(String filePath, ResourceStatus resourceStatus, OutputStream outputStream)
+  public void sendMessage(String filePath, ThreadStatus threadStatus)
       throws IOException {
+//    PathMessageResponserFactory pathMessageResponserFactory = new PathMessageResponserFactory(filePath, configmanager);
+//
+//    MessageResponser messageResponser = pathMessageResponserFactory.createMessageResponser();
 
-    MessageResponser messageResponser = MessageResponserFactory
-        .getMessageResponser(outputStream, configmanager, resourceStatus, filePath);
-
-    messageResponser.doSend();
+//    messageResponser.doSend(outputStream);
+//
+//    AbstractMessageResponserFactory factory = new OrderedMessageResponserFactories(configmanager).create();
+//
+//    factory.createMessageResponser(filePath);
   }
 
 
