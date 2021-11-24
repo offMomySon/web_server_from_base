@@ -10,10 +10,11 @@ public class OrderedMessageResponserFactories {
 
   public OrderedMessageResponserFactories(ConfigManager configmanager, ThreadStatus threadStatus) {
     // 순서를 보장해야합니다.
-    this.values = List.of(new ThreadMessageResponserFactory(threadStatus), new ConfigManagerMessageResponserFactory(configmanager), new PathMessageResponserFactory());
+    this.values = List
+        .of(new ServerStopMessageResponserFactory(), new ThreadMessageResponserFactory(threadStatus), new ConfigManagerMessageResponserFactory(configmanager), new PathMessageResponserFactory());
   }
 
-  public AbstractMessageResponserFactory create(){
+  public AbstractMessageResponserFactory create() {
     return new CompositeMessageResponserFactory(this.values);
   }
 }
