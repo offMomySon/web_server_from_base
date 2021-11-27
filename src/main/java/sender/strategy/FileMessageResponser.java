@@ -1,64 +1,60 @@
 package sender.strategy;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.invoke.MethodHandles;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class FileMessageResponser extends MessageResponser {
-
-  private static final Logger logger = LoggerFactory
-      .getLogger(MethodHandles.lookup().lookupClass());
-
-  private final OutputStream outputStream;
   private final String filePath;
+  private final char[] buffer = new char[4096];
 
-  public FileMessageResponser(OutputStream outputStream, String filePath) {
-    this.outputStream = new BufferedOutputStream(outputStream);
+  public FileMessageResponser(String filePath) {
     this.filePath = filePath;
   }
 
   @Override
-  public void doSend() {
-    logger.info("Start to response exist file.");
+  protected String getContentType() {
+    log.info("Guess content type.");
 
-    try {
-      File file = new File(filePath);
-      String responseMsg = createHeader(file.length(), getContentType(filePath));
-
-      outputStream.write(responseMsg.getBytes(StandardCharsets.UTF_8));
-
-      outputFile(filePath, outputStream);
-
-      outputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
-      outputStream.flush();
-
-      logger.info("Finish to response exit file.");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (filePath.endsWith(".html") || filePath.endsWith(".htm")) {
+      return "text/html";
+    } else if (filePath.endsWith(".txt") || filePath.endsWith(".java")) {
+      return "text/plain";
+    } else if (filePath.endsWith(".gif")) {
+      return "image/gif";
+    } else if (filePath.endsWith(".png")) {
+      return "image/png";
+    } else if (filePath.endsWith(".class")) {
+      return "application/octet-stream";
+    } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+      return "image/jpeg";
+    } else if (filePath.endsWith(".mpeg")) {
+      return "video/mpeg";
+    } else if (filePath.endsWith(".ts")) {
+      return "video/MP2T";
+    } else if (filePath.endsWith(".avi")) {
+      return "video/x-msvideo";
+    } else {
+      return "text/plain";
     }
   }
 
-  private void outputFile(String filePath, OutputStream outputStream) {
-    logger.info("Start to response file at http body.");
+  @Override
+  protected String getContent() {
+    try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));) {
+      int readNo = 0;
 
-    try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
-      byte[] buffer = new byte[8192];
-      int readNo = -1;
-
-      while ((readNo = fileInputStream.read(buffer)) != -1) {
-        logger.debug("File binary read looping.. path[{}]", filePath);
-        outputStream.write(buffer, 0, readNo);
+      while ((readNo = bufferedReader.read(buffer)) != -1) {
+        content.append(new String(buffer, 0, readNo));
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    logger.info("Finish readFile.");
+    return content.toString();
   }
 }

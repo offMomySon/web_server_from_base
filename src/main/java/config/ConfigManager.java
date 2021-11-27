@@ -78,6 +78,18 @@ public class ConfigManager {
     }
   }
 
+  public boolean isWelcomePage(String filePath) {
+    return basicConfig.getWelcomPagePath().equals(filePath);
+  }
+
+  public String creatFilePath(String target) {
+    return downloadConfig.getDownloadPath() + target;
+  }
+
+  public ThreadConfig getThreadConfig() {
+    return threadConfig;
+  }
+
   public int getPort() {
     return basicConfig.getPort();
   }

@@ -1,51 +1,44 @@
 package sender.strategy;
 
-import java.lang.invoke.MethodHandles;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class MessageResponser {
+  private static final String END_OF_LINE = "\r\n";
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private final StringBuilder headerBuilder = new StringBuilder();
+  protected final StringBuilder content = new StringBuilder();
 
-  public static final String DEFAULT_CONTENT_TYPE = "text/html";
+  private String createHeader(long contentLength) {
+    headerBuilder.append("HTTP/1.1 200 OK ").append(END_OF_LINE);
+    headerBuilder.append("Content-Length : ").append(contentLength).append(END_OF_LINE);
+    headerBuilder.append("Content-Type: ").append(getContentType()).append(END_OF_LINE);
+    headerBuilder.append("Date: ").append(new Date()).append(END_OF_LINE);
+    headerBuilder.append("Server: jihun server 1.0 ").append(END_OF_LINE);
+    headerBuilder.append(END_OF_LINE);
 
-  protected String createHeader(long contentLength, String contentType) {
-    return "HTTP/1.1 200 OK \r\n" +
-        "Content-Length : " + contentLength + "\r\n" +
-        "Content-Type: " + contentType + "\r\n" +
-        "Date: " + new Date() + "\r\n" +
-        "Server: jihun server 1.0 \r\n" +
-        "\r\n";
+    return headerBuilder.toString();
   }
 
-  protected String getContentType(String path) {
-    logger.info("Guess content type.");
+  public void doSend(OutputStream outputStream) {
+    try {
+      String content = getContent();
+      String header = createHeader(content.length());
 
-    if (path.endsWith(".html") || path.endsWith(".htm")) {
-      return "text/html";
-    } else if (path.endsWith(".txt") || path.endsWith(".java")) {
-      return "text/plain";
-    } else if (path.endsWith(".gif")) {
-      return "image/gif";
-    } else if (path.endsWith(".png")) {
-      return "image/png";
-    } else if (path.endsWith(".class")) {
-      return "application/octet-stream";
-    } else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-      return "image/jpeg";
-    } else if (path.endsWith(".mpeg")) {
-      return "video/mpeg";
-    } else if (path.endsWith(".ts")) {
-      return "video/MP2T";
-    } else if (path.endsWith(".avi")) {
-      return "video/x-msvideo";
-    } else {
-      return "text/plain";
+      outputStream.write(header.getBytes(StandardCharsets.UTF_8));
+      outputStream.write(content.getBytes(StandardCharsets.UTF_8));
+      outputStream.write(END_OF_LINE.getBytes(StandardCharsets.UTF_8));
+      outputStream.flush();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
-  public abstract void doSend();
+  protected abstract String getContentType();
+
+  protected abstract String getContent();
 }

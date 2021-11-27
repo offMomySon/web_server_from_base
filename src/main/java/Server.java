@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sender.factory.AbstractMessageResponserFactory;
+import sender.factory.OrderedMessageResponserFactories;
 
 public class Server {
 
@@ -14,10 +16,14 @@ public class Server {
 
   private final ServerSocket serverSocket;
   private final ThreadController threadController;
+  private final ConfigManager configManager;
+  private final AbstractMessageResponserFactory abstractMessageResponserFactory;
 
   public Server(ConfigManager configManager) {
+    this.configManager = configManager;
     serverSocket = createServerSocket(configManager.getPort());
     threadController = createThreadController(configManager);
+    abstractMessageResponserFactory = new OrderedMessageResponserFactories(threadController, configManager).create();
   }
 
   private static ServerSocket createServerSocket(int port) {
@@ -29,7 +35,7 @@ public class Server {
   }
 
   private static ThreadController createThreadController(ConfigManager configManager) {
-    return new ThreadController(configManager);
+    return new ThreadController(configManager.getThreadConfig());
   }
 
   public void start() {
@@ -40,10 +46,9 @@ public class Server {
         socket = serverSocket.accept();
 
         logger.info("accept.. request");
-        logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(),
-            socket.getPort());
+        logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(), socket.getPort());
 
-        threadController.process(socket);
+        threadController.process(socket, configManager, abstractMessageResponserFactory);
 
         socket = UNBOUNDED;
       }
@@ -55,7 +60,7 @@ public class Server {
           socket.close();
         }
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        throw new RuntimeException(ioException);
       }
     }
   }

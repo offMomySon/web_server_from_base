@@ -13,7 +13,6 @@ import resource.ResourceStatus;
 import sender.strategy.DirectoryMessageResponser;
 import sender.strategy.FileMessageResponser;
 import sender.strategy.MessageResponser;
-import sender.strategy.NotFoundMessageResponser;
 import sender.strategy.WelcomPageMessageResponser;
 
 class MessageResponserFactoryTest {
