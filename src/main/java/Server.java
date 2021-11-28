@@ -21,7 +21,7 @@ public class Server {
 
   public Server(ConfigManager configManager) {
     this.configManager = configManager;
-    serverSocket = createServerSocket(configManager.getPort());
+    serverSocket = createServerSocket(configManager.getBasicConfig().getPort());
     threadController = createThreadController(configManager);
     abstractMessageResponserFactory = new OrderedMessageResponserFactories(threadController, configManager).create();
   }

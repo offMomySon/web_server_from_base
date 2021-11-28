@@ -2,7 +2,7 @@ package sender.factory;
 
 import config.ConfigManager;
 import sender.strategy.MessageResponser;
-import sender.strategy.WelcomPageMessageResponser;
+import sender.strategy.WelcomePageMessageResponser;
 
 public class WelcomePageMessageResponserFactory implements AbstractMessageResponserFactory {
   private final ConfigManager configManager;
@@ -13,7 +13,7 @@ public class WelcomePageMessageResponserFactory implements AbstractMessageRespon
 
   @Override
   public MessageResponser createMessageResponser(String filePath) {
-    return new WelcomPageMessageResponser(configManager);
+    return new WelcomePageMessageResponser(configManager);
   }
 
   @Override
