@@ -1,12 +1,18 @@
 import config.ConfigManager;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reader.HttpRequest;
 import sender.factory.AbstractMessageResponserFactory;
 import sender.factory.OrderedMessageResponserFactories;
+import sender.strategy.MessageResponser;
 
 public class Server {
 
@@ -14,6 +20,7 @@ public class Server {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+  private final ExecutorService executorService = ForkJoinPool.commonPool();
   private final ServerSocket serverSocket;
   private final ThreadController threadController;
   private final ConfigManager configManager;
@@ -21,6 +28,7 @@ public class Server {
 
   public Server(ConfigManager configManager) {
     this.configManager = configManager;
+
     serverSocket = createServerSocket(configManager.getBasicConfig().getPort());
     threadController = createThreadController(configManager);
     abstractMessageResponserFactory = new OrderedMessageResponserFactories(threadController, configManager).create();
@@ -48,7 +56,9 @@ public class Server {
         logger.info("accept.. request");
         logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(), socket.getPort());
 
-        threadController.process(socket, configManager, abstractMessageResponserFactory);
+//        threadController.process(socket, configManager, abstractMessageResponserFactory);
+
+        process(socket, abstractMessageResponserFactory);
 
         socket = UNBOUNDED;
       }
@@ -64,4 +74,32 @@ public class Server {
       }
     }
   }
+
+  public void process(Socket socket, AbstractMessageResponserFactory factory) {
+    try {
+      InputStream inputStream = socket.getInputStream();
+      OutputStream outputStream = socket.getOutputStream();
+
+      if (!threadController.isProcessable()) {
+        doSend(inputStream, outputStream, factory);
+        return;
+      }
+
+      executorService.submit(() -> {
+        threadController.waitIfNotExistUseableThread();
+
+        threadController.runWithOccupiedWorkerThread(() -> doSend(inputStream, outputStream, factory));
+      });
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void doSend(InputStream inputStream, OutputStream outputStream, AbstractMessageResponserFactory factory) {
+    String requestTarget = new HttpRequest(inputStream).getRequestTarget();
+
+    MessageResponser messageResponser = factory.createMessageResponser(requestTarget);
+    messageResponser.doSend(outputStream);
+  }
+
 }
