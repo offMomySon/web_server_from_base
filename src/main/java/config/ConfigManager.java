@@ -12,11 +12,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder(access = AccessLevel.PRIVATE)
 public class ConfigManager {
+  private static ConfigManager configManager = getInstance();
+
   private final BasicConfig basicConfig;
   private final ThreadConfig threadConfig;
   private final DownloadConfig downloadConfig;
 
-  public static ConfigManager create() {
+  public static ConfigManager getInstance() {
+    if (configManager != null) {
+      return configManager;
+    }
+    return configManager = ConfigManager.create();
+  }
+
+  private static ConfigManager create() {
     return ConfigManager.builder()
         .basicConfig(BasicConfig.create())
         .threadConfig(ThreadConfig.create())

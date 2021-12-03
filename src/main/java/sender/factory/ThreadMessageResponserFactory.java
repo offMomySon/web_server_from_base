@@ -1,6 +1,5 @@
 package sender.factory;
 
-import thread.ThreadStatus;
 import sender.strategy.MessageResponser;
 import sender.strategy.SimpleMessageResponser;
 

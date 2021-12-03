@@ -31,7 +31,7 @@ class ConfigManagerTest {
             new ByteArrayInputStream(threadConfig.getBytes(StandardCharsets.UTF_8))));
 
     //when
-    ConfigManager configManager = ConfigManager.create();
+    ConfigManager configManager = ConfigManager.getInstance();
 
     //then
     Assertions.assertThat(true).as("failure - should be true").isTrue();
@@ -100,7 +100,7 @@ class ConfigManagerTest {
 
     //when
     Throwable thrown = catchThrowable(() -> {
-      ConfigManager configManager = ConfigManager.create();
+      ConfigManager configManager = ConfigManager.getInstance();
     });
 
     //then
