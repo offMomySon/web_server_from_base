@@ -1,4 +1,4 @@
-package sender.factory.thread;
+package thread;
 
 public interface ThreadStatus {
   public boolean isAvailable();

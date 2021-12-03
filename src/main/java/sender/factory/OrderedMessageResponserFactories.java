@@ -2,7 +2,7 @@ package sender.factory;
 
 import config.ConfigManager;
 import java.util.List;
-import sender.factory.thread.ThreadStatus;
+import thread.ThreadStatus;
 
 public class OrderedMessageResponserFactories {
   private final List<AbstractMessageResponserFactory> factories;
