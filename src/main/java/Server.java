@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import reader.HttpRequest;
 import sender.factory.AbstractMessageResponserFactory;
 import sender.factory.OrderedMessageResponserFactories;
+import sender.factory.ThreadMessageResponserFactory;
+import sender.factory.thread.ThreadStatusSnapshot;
 import sender.strategy.MessageResponser;
 
 public class Server {
@@ -22,7 +24,7 @@ public class Server {
 
   private final ExecutorService executorService = ForkJoinPool.commonPool();
   private final ServerSocket serverSocket;
-  private final ThreadController threadController;
+  private final ThreadControllerSnapshot threadController;
   private final ConfigManager configManager;
   private final AbstractMessageResponserFactory abstractMessageResponserFactory;
 
@@ -31,7 +33,7 @@ public class Server {
 
     serverSocket = createServerSocket(configManager.getBasicConfig().getPort());
     threadController = createThreadController(configManager);
-    abstractMessageResponserFactory = new OrderedMessageResponserFactories(threadController, configManager).create();
+    abstractMessageResponserFactory = new OrderedMessageResponserFactories(configManager).create();
   }
 
   private static ServerSocket createServerSocket(int port) {
@@ -42,8 +44,8 @@ public class Server {
     }
   }
 
-  private static ThreadController createThreadController(ConfigManager configManager) {
-    return new ThreadController(configManager.getThreadConfig());
+  private static ThreadControllerSnapshot createThreadController(ConfigManager configManager) {
+    return new ThreadControllerSnapshot(configManager.getThreadConfig());
   }
 
   public void start() {
@@ -56,9 +58,7 @@ public class Server {
         logger.info("accept.. request");
         logger.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(), socket.getPort());
 
-//        threadController.process(socket, configManager, abstractMessageResponserFactory);
-
-        process(socket, abstractMessageResponserFactory);
+        process(socket);
 
         socket = UNBOUNDED;
       }
@@ -75,30 +75,64 @@ public class Server {
     }
   }
 
-  public void process(Socket socket, AbstractMessageResponserFactory factory) {
+  public void process(Socket socket) {
     try {
       InputStream inputStream = socket.getInputStream();
       OutputStream outputStream = socket.getOutputStream();
 
-      if (!threadController.isProcessable()) {
-        doSend(inputStream, outputStream, factory);
-        return;
-      }
+      process(inputStream, outputStream);
 
-      executorService.submit(() -> {
-        threadController.waitIfNotExistUseableThread();
-
-        threadController.runWithOccupiedWorkerThread(() -> doSend(inputStream, outputStream, factory));
-      });
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  private void doSend(InputStream inputStream, OutputStream outputStream, AbstractMessageResponserFactory factory) {
+  private void process(InputStream inputStream, OutputStream outputStream) {
+    if (!threadController.isProcessable()) {
+      ThreadMessageResponserFactory noThreadCountFactory =
+          new ThreadMessageResponserFactory(new ThreadStatusSnapshot() {
+            @Override
+            public boolean isAvailable() {
+              return false;
+            }
+          });
+
+      ThreadMessageResponserFactory factory2 = new ThreadMessageResponserFactory(() -> {
+        return false;
+      });
+
+      ThreadMessageResponserFactory factory3 =
+          new ThreadMessageResponserFactory(threadController.createSnapShot());
+
+      MessageResponser messageResponser = factory3.createMessageResponser();
+
+      messageResponser.doSend(outputStream);
+//
+//      AbstractMessageResponserFactory noThreadCountFactory = new ThreadMessageResponserFactory(threadController.createSnapShot());
+//      doSend(inputStream, outputStream, noThreadCountFactory);
+
+      return;
+    }
+
+    executorService.submit(() -> {
+      threadController.waitIfNotExistUseableThread();
+
+      threadController.runWithOccupiedWorkerThread(() -> doSend(inputStream, outputStream));
+    });
+  }
+
+//  private static void doSend(InputStream inputStream, OutputStream outputStream,
+//      AbstractMessageResponserFactory abstractMessageResponserFactory) {
+//    String requestTarget = new HttpRequest(inputStream).getRequestTarget();
+//
+//    MessageResponser messageResponser = abstractMessageResponserFactory.createMessageResponser(requestTarget);
+//    messageResponser.doSend(outputStream);
+//  }
+
+  private void doSend(InputStream inputStream, OutputStream outputStream) {
     String requestTarget = new HttpRequest(inputStream).getRequestTarget();
 
-    MessageResponser messageResponser = factory.createMessageResponser(requestTarget);
+    MessageResponser messageResponser = abstractMessageResponserFactory.createMessageResponser(requestTarget);
     messageResponser.doSend(outputStream);
   }
 

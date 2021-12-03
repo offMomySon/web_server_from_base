@@ -1,5 +1,6 @@
 package sender.factory.thread;
 
-public interface ThreadStatus {
+@FunctionalInterface
+public interface ThreadStatusSnapshot {
   public boolean isAvailable();
 }

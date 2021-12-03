@@ -31,12 +31,6 @@ public class DownloadConfig {
     this.restrictedFileExtensionAtIps = restrictedFileExtensionAtIps;
     this.periodCountConfigAtIps = periodCountConfigAtIps;
 
-    log.info(downloadPath);
-    log.info(String.valueOf(period));
-    log.info(String.valueOf(count));
-    log.info(String.valueOf(restrictedFileExtension));
-    log.info(String.valueOf(restrictedFileExtensionAtIps));
-    log.info(String.valueOf(periodCountConfigAtIps));
   }
 
   public static DownloadConfig create() {

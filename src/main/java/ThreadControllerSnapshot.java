@@ -1,14 +1,14 @@
 import config.server.thread.ThreadConfig;
 import lombok.extern.slf4j.Slf4j;
-import sender.factory.thread.ThreadStatus;
+import sender.factory.thread.ThreadStatusSnapshot;
 import thread.ThreadWorker;
 
 @Slf4j
-public class ThreadController implements ThreadStatus {
+public class ThreadControllerSnapshot {
   private final ThreadWorker currentUsingThreadCount;
   private final ThreadWorker currentWaitThreadCount;
 
-  public ThreadController(ThreadConfig threadConfig) {
+  public ThreadControllerSnapshot(ThreadConfig threadConfig) {
     currentUsingThreadCount = new ThreadWorker(threadConfig.getUsableThreadCount());
     currentWaitThreadCount = new ThreadWorker(threadConfig.getWaitableThreadCount());
   }
@@ -36,8 +36,8 @@ public class ThreadController implements ThreadStatus {
     currentUsingThreadCount.runWithOccupied(runnable);
   }
 
-  @Override
-  public boolean isAvailable() {
-    return isProcessable();
+  public ThreadStatusSnapshot createSnapShot() {
+    boolean isProcessable = isProcessable();
+    return () -> isProcessable;
   }
 }

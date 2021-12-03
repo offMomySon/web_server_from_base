@@ -1,25 +1,29 @@
 package sender.factory;
 
-import sender.factory.thread.ThreadStatus;
+import sender.factory.thread.ThreadStatusSnapshot;
 import sender.strategy.MessageResponser;
 import sender.strategy.SimpleMessageResponser;
 
 public class ThreadMessageResponserFactory implements AbstractMessageResponserFactory {
   private final static String NOT_AVAILABLE_THREAD = "not available thread.";
 
-  private final ThreadStatus threadStatus;
+  private final ThreadStatusSnapshot threadStatusSnapshot;
 
-  public ThreadMessageResponserFactory(ThreadStatus threadStatus) {
-    this.threadStatus = threadStatus;
+  public ThreadMessageResponserFactory(ThreadStatusSnapshot threadStatusSnapshot) {
+    this.threadStatusSnapshot = threadStatusSnapshot;
   }
 
-  @Override
-  public MessageResponser createMessageResponser(String filePath) {
+  public MessageResponser createMessageResponser() {
     return new SimpleMessageResponser(NOT_AVAILABLE_THREAD);
   }
 
   @Override
+  public MessageResponser createMessageResponser(String filePath) {
+    return createMessageResponser();
+  }
+
+  @Override
   public boolean isSupported(String filePath) {
-    return !threadStatus.isAvailable();
+    return !threadStatusSnapshot.isAvailable();
   }
 }
