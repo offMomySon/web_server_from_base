@@ -1,10 +1,8 @@
 package thread;
 
 import config.ConfigManager;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import reader.HttpRequest;
@@ -14,12 +12,6 @@ import sender.strategy.MessageResponser;
 
 public class RequestProcessor {
   private static final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-  private final AbstractMessageResponserFactory responserFactory;
-
-  public RequestProcessor() {
-    responserFactory = new OrderedMessageResponserFactories(ConfigManager.getInstance()).create();
-  }
 
   // 안티패턴?
   // 어차피 실제 실행되는 메소느드는 doProcess() 니까 성문 여러개 만들어도 괜찮지 않나?
@@ -34,12 +26,15 @@ public class RequestProcessor {
 //  }
 
   public void doProcess(InputStream inputStream, OutputStream outputStream) {
-    ThreadResourceManager threadResourceManager = new ThreadResourceManager();
+    ThreadManipulator threadManipulator = new ThreadManipulator();
+    ThreadStatusSnapShot statusSnapShot = threadManipulator.createStatusSnapShot();
+    AbstractMessageResponserFactory responserFactory = new OrderedMessageResponserFactories(statusSnapShot, ConfigManager.getInstance()).create();
 
     //ditto
     // 검사 -> increase wait count 하기 전까지 동기화 해야함.
     // 아니면 2 개의 thread 가 검사를 통과하고 wait count 가 2개 이상 증가 할 수 있음.
-    if (!threadResourceManager.isProcessable()) {
+    if (!statusSnapShot.isAvailable()) {
+      sendMessage(outputStream, responserFactory);
       return;
     }
 
@@ -55,14 +50,20 @@ public class RequestProcessor {
     // 1) check run count -> decrease wait count -> increase run count 동기화 보장되어야함.
     // 2) check run count -> increase run count 동기화 보장되어야함.
     threadPool.execute(() -> {
-      threadResourceManager.runProcessIn(() -> doSend(inputStream, outputStream));
+      threadManipulator.run(() -> {
+        readHttpAndsendMessage(inputStream, outputStream, responserFactory);
+      });
     });
   }
 
-  private void doSend(InputStream inputStream, OutputStream outputStream) {
+  private void sendMessage(OutputStream outputStream, AbstractMessageResponserFactory responserFactory) {
+    MessageResponser messageResponser = responserFactory.createMessageResponser("");
+    messageResponser.doSend(outputStream);
+  }
+
+  private void readHttpAndsendMessage(InputStream inputStream, OutputStream outputStream, AbstractMessageResponserFactory responserFactory) {
     String requestTarget = new HttpRequest(inputStream).getRequestTarget();
 
-    MessageResponser messageResponser = responserFactory.createMessageResponser(requestTarget);
-    messageResponser.doSend(outputStream);
+    sendMessage(outputStream, responserFactory);
   }
 }

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 // ThreadWorker 의 runWithOccupied 구현후
 // concrete 한 runnable 제공하는 책임/역할 로 변경됨.. 이걸로 충분한가?
 @Slf4j
-public class ThreadResourceManager implements ThreadStatus {
+public class ThreadManipulator {
   // waitIfNotExistLeftThread() ->  runWithOccupiedWorkerThread() 순서 보장을 위해 ,
   // ConfigManager 를 전역으로 가져올 수 있게 했다.
 
@@ -25,15 +25,15 @@ public class ThreadResourceManager implements ThreadStatus {
   // 너무 데이터 적인 측면인가?
   private boolean beforeWaited;
 
-  public ThreadResourceManager() {
+  public ThreadManipulator() {
     beforeWaited = false;
   }
 
-  public boolean isProcessable() {
+  private boolean isProcessable() {
     return usableWorker.isLeft() || waitableWorker.isLeft();
   }
 
-  public void waitIfNotExistLeftThread() {
+  private void waitIfNotExistLeftThread() {
     // 보장되어야하는 호출순서는 아래와 같다.
     // waitIfNotExistLeftThread() ->  runWithOccupiedWorkerThread()
 
@@ -67,20 +67,21 @@ public class ThreadResourceManager implements ThreadStatus {
     beforeWaited = true;
   }
 
-  public void runWithOccupiedWorkerThread(Runnable request) {
+  private void runWithOccupiedWorkerThread(Runnable request) {
     if (!beforeWaited) {
       throw new RuntimeException("waitIfNotExistLeftThread 를 먼저 수행해야 합니다.");
     }
     usableWorker.runWithOccupied(request);
   }
 
-  public void runProcessIn(Runnable request) {
+  public void run(Runnable processRequest) {
     waitIfNotExistLeftThread();
-    runWithOccupiedWorkerThread(request);
+
+    runWithOccupiedWorkerThread(processRequest);
   }
 
-  public boolean isAvailable() {
-    
-    return isProcessable();
+  public ThreadStatusSnapShot createStatusSnapShot() {
+    boolean processable = isProcessable();
+    return () -> processable;
   }
 }
