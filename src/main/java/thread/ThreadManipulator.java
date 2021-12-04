@@ -2,6 +2,7 @@ package thread;
 
 import config.ConfigManager;
 import lombok.extern.slf4j.Slf4j;
+import thread.snapshot.ThreadStatusSnapShot;
 
 // 이 클래스는 Thread 를 관리하는 class 이다.
 // 그렇기 때문에, 메세지를 보내는 것과 관련된 역할을 하는것은 맞지않다.

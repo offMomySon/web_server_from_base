@@ -1,6 +1,5 @@
 package reader;
 
-import httpspec.HttpMethod;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,19 +9,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
+import reader.httpspec.HttpHeader;
 
-import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
-import static org.junit.jupiter.api.Assertions.*;
 
 class HttpHeaderTest {
 
@@ -74,7 +69,7 @@ class HttpHeaderTest {
             new ByteArrayInputStream(httpHeaderStr.getBytes(StandardCharsets.UTF_8)))));
     //when
     HttpHeader httpHeader = new HttpHeader(bufferedReader);
-    
+
     //then
     SoftAssertions softly = new SoftAssertions();
     for (String actualKey : httpHeader.keySet()) {

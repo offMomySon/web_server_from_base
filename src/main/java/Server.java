@@ -3,8 +3,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import lombok.extern.slf4j.Slf4j;
-import reader.HttpRequest;
-import thread.RequestProcessor;
+import path.AbstractRequestTargetChecker;
+import path.creater.OrderedRequestTargetChecker;
+import reader.httpspec.HttpRequest;
+import response.sender.RequestSender;
 
 @Slf4j
 public class Server {
@@ -35,7 +37,11 @@ public class Server {
         log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
         HttpRequest httpRequest = new HttpRequest(socket.getInputStream());
-        new RequestProcessor().doProcess(httpRequest, socket.getOutputStream());
+
+        AbstractRequestTargetChecker requestTargetChecker = new OrderedRequestTargetChecker(socket.getInetAddress().getHostAddress()).create();
+        RequestSender requestSender = requestTargetChecker.messageSend(httpRequest.getRequestTarget());
+        requestSender.doProcess(httpRequest, socket.getOutputStream());
+//        new ThreadRelatedRequestSender().doProcess(httpRequest, socket.getOutputStream());
 
         socket = UNBOUNDED;
       }
@@ -51,4 +57,6 @@ public class Server {
       }
     }
   }
+
+
 }

@@ -25,7 +25,7 @@ public class RestrictedFileExtensionAtIp {
     return ip.equals(clientIpAddress);
   }
 
-  public boolean isRestrictedFileExtension(String fileExtension) {
+  public boolean containsRestrictedFileExtension(String fileExtension) {
     return restrictedFileExtension.contains(fileExtension);
   }
 }
