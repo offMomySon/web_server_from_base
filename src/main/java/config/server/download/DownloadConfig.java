@@ -44,4 +44,26 @@ public class DownloadConfig {
     return downloadConfig;
   }
 
+  public boolean containsIpAddress(String ipAddress) {
+    for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
+      if (restrictedFileExtensionAtIp.compareIpAddress(ipAddress)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean containsRestrictedFileExtensionAtIp(String ipAddress, String fileExtension) {
+    for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
+      if (restrictedFileExtensionAtIp.compareIpAddress(ipAddress) && restrictedFileExtensionAtIp.containsRestrictedFileExtension(fileExtension)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean containsRestrictedFileExtension(String fileExtension) {
+    log.info("containsRestrictedFileExtension = {} ", restrictedFileExtension.contains(fileExtension));
+    return restrictedFileExtension.contains(fileExtension);
+  }
 }
