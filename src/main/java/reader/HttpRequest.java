@@ -1,17 +1,15 @@
 package reader;
 
-import static java.lang.Integer.*;
-import static util.IoUtil.*;
+import static java.lang.Integer.parseInt;
+import static util.IoUtil.createReader;
 
 import httpspec.HttpMethod;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.IoUtil;
 
 public class HttpRequest {
 
@@ -23,10 +21,11 @@ public class HttpRequest {
   private final HttpStartLine httpStartLine;
   private final HttpHeader httpHeader;
   private final HttpBody httpBody;
-  
+
   private final BufferedReader reader;
 
   public HttpRequest(InputStream inputStream) {
+    // http read 할떄 BufferedReader 을 httpStartLine,httpHeader, httpBody 에서 따로 만들면 읽지못해서 여기서 BufferedReader 를 생성함.
     reader = createReader(inputStream);
 
     httpStartLine = new HttpStartLine(reader);

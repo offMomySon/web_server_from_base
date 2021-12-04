@@ -1,17 +1,13 @@
 package reader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static util.IoUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpHeader {
 
@@ -24,11 +20,11 @@ public class HttpHeader {
       String headerLine = null;
       logger.info("Ready to get http header");
       while ((headerLine = reader.readLine()) != null && (headerLine.length() != 0)) {
-        logger.debug("Loop.. get http header");
         logger.debug(headerLine);
 
-        String key = headerLine.split(":", 2)[0].trim();
-        String value = headerLine.split(":", 2)[1].trim();
+        String[] headers = headerLine.split(":");
+        String key = headers[0].trim();
+        String value = headers[1].trim();
 
         if (key.length() == 0) {
           throw new IllegalArgumentException("key is empty value.");

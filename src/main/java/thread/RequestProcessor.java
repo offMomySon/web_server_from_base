@@ -1,7 +1,6 @@
 package thread;
 
 import config.ConfigManager;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,7 +24,7 @@ public class RequestProcessor {
 //    }
 //  }
 
-  public void doProcess(InputStream inputStream, OutputStream outputStream) {
+  public void doProcess(HttpRequest httpRequest, OutputStream outputStream) {
     ThreadManipulator threadManipulator = new ThreadManipulator();
     ThreadStatusSnapShot statusSnapShot = threadManipulator.createStatusSnapShot();
     AbstractMessageResponserFactory responserFactory = new OrderedMessageResponserFactories(statusSnapShot, ConfigManager.getInstance()).create();
@@ -34,7 +33,8 @@ public class RequestProcessor {
     // 검사 -> increase wait count 하기 전까지 동기화 해야함.
     // 아니면 2 개의 thread 가 검사를 통과하고 wait count 가 2개 이상 증가 할 수 있음.
     if (!statusSnapShot.isAvailable()) {
-      sendMessage(outputStream, responserFactory);
+      MessageResponser messageResponser = responserFactory.createMessageResponser("");
+      messageResponser.doSend(outputStream);
       return;
     }
 
@@ -51,19 +51,9 @@ public class RequestProcessor {
     // 2) check run count -> increase run count 동기화 보장되어야함.
     threadPool.execute(() -> {
       threadManipulator.run(() -> {
-        readHttpAndsendMessage(inputStream, outputStream, responserFactory);
+        MessageResponser messageResponser = responserFactory.createMessageResponser(httpRequest.getRequestTarget());
+        messageResponser.doSend(outputStream);
       });
     });
-  }
-
-  private void sendMessage(OutputStream outputStream, AbstractMessageResponserFactory responserFactory) {
-    MessageResponser messageResponser = responserFactory.createMessageResponser("");
-    messageResponser.doSend(outputStream);
-  }
-
-  private void readHttpAndsendMessage(InputStream inputStream, OutputStream outputStream, AbstractMessageResponserFactory responserFactory) {
-    String requestTarget = new HttpRequest(inputStream).getRequestTarget();
-
-    sendMessage(outputStream, responserFactory);
   }
 }

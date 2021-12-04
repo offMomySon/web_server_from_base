@@ -20,4 +20,12 @@ public class RestrictedFileExtensionAtIp {
     log.info(ip);
     log.info(String.valueOf(restrictedFileExtension));
   }
+
+  public boolean compareIpAddress(String clientIpAddress) {
+    return ip.equals(clientIpAddress);
+  }
+
+  public boolean isRestrictedFileExtension(String fileExtension) {
+    return restrictedFileExtension.contains(fileExtension);
+  }
 }

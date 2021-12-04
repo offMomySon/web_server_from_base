@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import lombok.extern.slf4j.Slf4j;
+import reader.HttpRequest;
 import thread.RequestProcessor;
 
 @Slf4j
@@ -31,9 +32,10 @@ public class Server {
         socket = serverSocket.accept();
 
         log.info("accept.. request");
-        log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress(), socket.getPort());
+        log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
-        new RequestProcessor().doProcess(socket.getInputStream(), socket.getOutputStream());
+        HttpRequest httpRequest = new HttpRequest(socket.getInputStream());
+        new RequestProcessor().doProcess(httpRequest, socket.getOutputStream());
 
         socket = UNBOUNDED;
       }
