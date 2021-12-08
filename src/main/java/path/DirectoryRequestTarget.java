@@ -4,7 +4,7 @@ import response.messageFactory.PathMessageFactory;
 import response.sender.NotThreadRelatedRequestSender;
 import response.sender.RequestSender;
 
-public class DirectoryRequestTarget implements AbstractRequestTargetChecker {
+public class DirectoryRequestTarget implements RequestTargetChecker {
   private final PathMessageFactory pathMessageResponserFactory = new PathMessageFactory();
 
   @Override

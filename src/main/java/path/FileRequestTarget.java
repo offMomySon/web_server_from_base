@@ -3,7 +3,7 @@ package path;
 import response.sender.RequestSender;
 import response.sender.ThreadRelatedRequestSender;
 
-public class FileRequestTarget implements AbstractRequestTargetChecker {
+public class FileRequestTarget implements RequestTargetChecker {
   @Override
   public RequestSender messageSend(String requestPath) {
     return new ThreadRelatedRequestSender();

@@ -13,6 +13,6 @@ public class NotThreadRelatedRequestSender extends RequestSender {
   public void doProcess(HttpRequest httpRequest, OutputStream outputStream) {
     AbstractMessageFactory responserFactory = new OrderedMessageResponserFactories(() -> false, ConfigManager.getInstance()).create();
     Message message = responserFactory.createMessage(httpRequest.getRequestTarget());
-    message.doSend(outputStream);
+    message.create();
   }
 }

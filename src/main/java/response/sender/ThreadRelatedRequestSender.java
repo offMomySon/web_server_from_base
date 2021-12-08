@@ -37,7 +37,7 @@ public class ThreadRelatedRequestSender extends RequestSender {
     // 아니면 2 개의 thread 가 검사를 통과하고 wait count 가 2개 이상 증가 할 수 있음.
     if (!statusSnapShot.isAvailable()) {
       Message message = responserFactory.createMessage("");
-      message.doSend(outputStream);
+      message.create();
       return;
     }
 
@@ -55,7 +55,7 @@ public class ThreadRelatedRequestSender extends RequestSender {
     threadPool.execute(() -> {
       threadManipulator.run(() -> {
         Message message = responserFactory.createMessage(httpRequest.getRequestTarget());
-        message.doSend(outputStream);
+        message.create();
       });
     });
   }

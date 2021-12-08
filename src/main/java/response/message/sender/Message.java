@@ -24,18 +24,11 @@ public abstract class Message {
     return headerBuilder.toString();
   }
 
-  public void doSend(OutputStream outputStream) {
-    try {
-      String content = getContent();
-      String header = createHeader(content.length());
+  public String create(){
+    String content = getContent();
+    String header = createHeader(content.length());
 
-      outputStream.write(header.getBytes(StandardCharsets.UTF_8));
-      outputStream.write(content.getBytes(StandardCharsets.UTF_8));
-      outputStream.write(END_OF_LINE.getBytes(StandardCharsets.UTF_8));
-      outputStream.flush();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return header + content + END_OF_LINE;
   }
 
   protected abstract String getContentType();

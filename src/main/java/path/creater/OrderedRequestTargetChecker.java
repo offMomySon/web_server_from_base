@@ -1,7 +1,7 @@
 package path.creater;
 
 import java.util.List;
-import path.AbstractRequestTargetChecker;
+import path.RequestTargetChecker;
 import path.composite.CompositeRequestTargetChecker;
 import path.DirectoryRequestTarget;
 import path.FileRequestTarget;
@@ -9,7 +9,7 @@ import path.RestrictedFileExtension;
 import path.SpecificUserRestrictedFileExtension;
 
 public class OrderedRequestTargetChecker {
-  private final List<AbstractRequestTargetChecker> pathCheckers;
+  private final List<RequestTargetChecker> pathCheckers;
 
   public OrderedRequestTargetChecker(String clientIpAddress) {
     pathCheckers = List.of(
@@ -19,7 +19,7 @@ public class OrderedRequestTargetChecker {
         new FileRequestTarget());
   }
 
-  public AbstractRequestTargetChecker create() {
+  public RequestTargetChecker create() {
     return new CompositeRequestTargetChecker(pathCheckers);
   }
 }

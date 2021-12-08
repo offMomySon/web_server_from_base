@@ -12,6 +12,6 @@ public class RestrictedFileExtensionRequestSender extends RequestSender {
 
   public void doProcess(HttpRequest httpRequest, OutputStream outputStream) {
     Message message = new SimpleMessage(RESTRICTED_FILE_EXTENSION);
-    message.doSend(outputStream);
+    message.create();
   }
 }

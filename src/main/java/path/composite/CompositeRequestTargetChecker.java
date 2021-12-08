@@ -1,13 +1,13 @@
 package path.composite;
 
 import java.util.List;
-import path.AbstractRequestTargetChecker;
+import path.RequestTargetChecker;
 import response.sender.RequestSender;
 
-public class CompositeRequestTargetChecker implements AbstractRequestTargetChecker {
-  private final List<AbstractRequestTargetChecker> pathCheckers;
+public class CompositeRequestTargetChecker implements RequestTargetChecker {
+  private final List<RequestTargetChecker> pathCheckers;
 
-  public CompositeRequestTargetChecker(List<AbstractRequestTargetChecker> paths) {
+  public CompositeRequestTargetChecker(List<RequestTargetChecker> paths) {
     this.pathCheckers = paths;
   }
 

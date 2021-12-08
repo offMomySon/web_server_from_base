@@ -8,7 +8,7 @@ import response.sender.RequestSender;
 import response.sender.RestrictedFileExtensionRequestSender;
 
 @Slf4j
-public class RestrictedFileExtension implements AbstractRequestTargetChecker {
+public class RestrictedFileExtension implements RequestTargetChecker {
   // instance 변수 설정할 필요 있나
   private final List<String> restrictedFileExtension = ConfigManager.getInstance().getDownloadConfig().getRestrictedFileExtension();
 

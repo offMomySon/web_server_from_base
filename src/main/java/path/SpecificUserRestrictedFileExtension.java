@@ -8,7 +8,7 @@ import response.sender.RestrictedFileExtensionRequestSender;
 import response.sender.ThreadRelatedRequestSender;
 
 @Slf4j
-public class SpecificUserRestrictedFileExtension implements AbstractRequestTargetChecker {
+public class SpecificUserRestrictedFileExtension implements RequestTargetChecker {
   private final String clientIpAddress;
 
   public SpecificUserRestrictedFileExtension(String clientIpAddress) {
