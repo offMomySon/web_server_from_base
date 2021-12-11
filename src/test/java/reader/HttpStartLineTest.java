@@ -12,8 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import reader.httpspec.method.HttpMethod;
-import reader.httpspec.HttpStartLine;
+import reader.httpspec.startLine.HttpMethod;
+import reader.httpspec.startLine.HttpStartLine;
 
 class HttpStartLineTest {
 
