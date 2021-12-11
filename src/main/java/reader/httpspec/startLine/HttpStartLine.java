@@ -8,10 +8,13 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import reader.httpspec.HttpRequest;
 
 @Getter
 @Slf4j
 public class HttpStartLine {
+  public static final RequestTarget EMPTY_REQUEST_TARGET = RequestTarget.create("");
+
   private final HttpMethod httpMethod;
   private final RequestTarget requestTarget;
   private final String httpVersion;

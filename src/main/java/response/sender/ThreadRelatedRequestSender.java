@@ -6,11 +6,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import reader.httpspec.HttpRequest;
+import reader.httpspec.startLine.HttpStartLine;
 import response.message.sender.Message;
 import response.messageFactory.AbstractMessageFactory;
 import response.messageFactory.creater.OrderedMessageResponserFactories;
 import thread.ThreadManipulator;
 import thread.snapshot.ThreadStatusSnapShot;
+
+import static reader.httpspec.startLine.HttpStartLine.*;
 
 @Slf4j
 public class ThreadRelatedRequestSender extends RequestSender {
@@ -36,7 +39,7 @@ public class ThreadRelatedRequestSender extends RequestSender {
     // 검사 -> increase wait count 하기 전까지 동기화 해야함.
     // 아니면 2 개의 thread 가 검사를 통과하고 wait count 가 2개 이상 증가 할 수 있음.
     if (!statusSnapShot.isAvailable()) {
-      Message message = responserFactory.createMessage("");
+      Message message = responserFactory.createMessage(EMPTY_REQUEST_TARGET);
       message.create();
       return;
     }

@@ -1,6 +1,8 @@
-package response.messageFactory.composite;
+package response.messageFactory;
 
 import java.util.List;
+
+import reader.httpspec.startLine.RequestTarget;
 import response.message.sender.Message;
 import response.messageFactory.AbstractMessageFactory;
 
@@ -12,7 +14,7 @@ public class CompositeMessageFactory implements AbstractMessageFactory {
   }
 
   @Override
-  public Message createMessage(String requestTarget) {
+  public Message createMessage(RequestTarget requestTarget) {
     return factories.stream()
         .filter(factory -> factory.isSupported(requestTarget))
         .findFirst()
@@ -21,7 +23,7 @@ public class CompositeMessageFactory implements AbstractMessageFactory {
   }
 
   @Override
-  public boolean isSupported(String path) {
-    return factories.stream().anyMatch(factory -> factory.isSupported(path));
+  public boolean isSupported(RequestTarget requestTarget) {
+    return factories.stream().anyMatch(factory -> factory.isSupported(requestTarget));
   }
 }

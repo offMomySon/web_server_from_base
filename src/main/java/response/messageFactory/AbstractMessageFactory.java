@@ -1,10 +1,11 @@
 package response.messageFactory;
 
+import reader.httpspec.startLine.RequestTarget;
 import response.message.sender.Message;
 
 public interface AbstractMessageFactory {
 
-  Message createMessage(String requestTarget);
+  Message createMessage(RequestTarget requestTarget);
 
-  boolean isSupported(String filePath);
+  boolean isSupported(RequestTarget requestTarget);
 }

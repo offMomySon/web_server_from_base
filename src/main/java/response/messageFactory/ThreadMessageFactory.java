@@ -1,5 +1,6 @@
 package response.messageFactory;
 
+import reader.httpspec.startLine.RequestTarget;
 import response.message.sender.Message;
 import response.message.content.SimpleMessage;
 import thread.snapshot.ThreadStatusSnapShot;
@@ -14,12 +15,12 @@ public class ThreadMessageFactory implements AbstractMessageFactory {
   }
 
   @Override
-  public Message createMessage(String filePath) {
+  public Message createMessage(RequestTarget requestTarget) {
     return new SimpleMessage(NOT_AVAILABLE_THREAD);
   }
 
   @Override
-  public boolean isSupported(String filePath) {
+  public boolean isSupported(RequestTarget requestTarget) {
     return !statusSnapShot.isAvailable();
   }
 }

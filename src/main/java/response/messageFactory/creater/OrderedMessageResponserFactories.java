@@ -6,7 +6,7 @@ import response.messageFactory.AbstractMessageFactory;
 import response.messageFactory.PathMessageFactory;
 import response.messageFactory.ThreadMessageFactory;
 import response.messageFactory.WelcomePageMessageFactory;
-import response.messageFactory.composite.CompositeMessageFactory;
+import response.messageFactory.CompositeMessageFactory;
 import thread.snapshot.ThreadStatusSnapShot;
 
 public class OrderedMessageResponserFactories {

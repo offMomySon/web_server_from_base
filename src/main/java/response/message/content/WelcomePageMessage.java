@@ -29,7 +29,7 @@ public class WelcomePageMessage extends Message {
     DownloadConfig downloadConfig = configManager.getDownloadConfig();
 
     content.append("Server port : ").append(basicConfig.getPort()).append("</br>");
-    content.append("welcome page path : ").append(basicConfig.getWelcomePagePath()).append("</br>");
+    content.append("welcome page path : ").append(basicConfig.getWelcomePageURI()).append("</br>");
     content.append("usable thread count : ").append(threadConfig.getUsableThreadCount()).append("</br>");
     content.append("waitable thread count : ").append(threadConfig.getWaitableThreadCount()).append("</br>");
     content.append("download path : ").append(downloadConfig.getDownloadPath()).append("</br>");

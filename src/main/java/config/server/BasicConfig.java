@@ -3,18 +3,19 @@ package config.server;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import reader.httpspec.startLine.RequestTarget;
 
 @Getter
 public class BasicConfig {
   private static final String BASIC_CONFIG_PATH = "src/main/resources/config/basic_setting.json";
 
   private final int port;
-  private final String welcomePagePath;
+  private final RequestTarget welcomePageURI;
   
   @JsonCreator
-  public BasicConfig(@JsonProperty("port") int port, @JsonProperty("welcomePagePath") String welcomePagePath) {
+  public BasicConfig(@JsonProperty("port") int port, @JsonProperty("welcomePagePath") RequestTarget welcomePageURI) {
     this.port = port;
-    this.welcomePagePath = welcomePagePath;
+    this.welcomePageURI = welcomePageURI;
   }
 
   public static BasicConfig create() {
@@ -22,7 +23,7 @@ public class BasicConfig {
     return basicConfig;
   }
 
-  public boolean isWelcomePage(String filePath) {
-    return welcomePagePath.equals(filePath);
+  public boolean isWelcomePage(RequestTarget requestTarget) {
+    return welcomePageURI.equals(requestTarget);
   }
 }

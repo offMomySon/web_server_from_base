@@ -1,8 +1,8 @@
 package response.messageFactory;
 
 import config.ConfigManager;
-import java.io.File;
 import lombok.extern.slf4j.Slf4j;
+import reader.httpspec.startLine.RequestTarget;
 import response.message.content.DirectoryMessage;
 import response.message.content.FileMessage;
 import response.message.sender.Message;
@@ -15,25 +15,25 @@ public class PathMessageFactory implements AbstractMessageFactory {
   private final ConfigManager configManager = ConfigManager.getInstance();
 
   @Override
-  public Message createMessage(String targetPath) {
-    String filePath = configManager.creatFilePath(targetPath);
-    File file = new File(filePath);
+  public Message createMessage(RequestTarget requestTarget) {
+    RequestTarget downloadTarget = ConfigManager.getInstance().getDownloadPath();
+    requestTarget = downloadTarget.append(requestTarget);
 
-    log.info("FilePath = {}", filePath);
+    log.info("FilePath = {}", requestTarget);
 
-    if (file.exists() && file.isFile()) {
-      return new FileMessage(filePath);
+    if (requestTarget.exists() && requestTarget.isFile()) {
+      return new FileMessage(requestTarget.toString());
     }
 
-    if (file.exists() && file.isDirectory()) {
-      return new DirectoryMessage(filePath);
+    if (requestTarget.exists() && requestTarget.isDirectory()) {
+      return new DirectoryMessage(requestTarget.toString());
     }
 
     return new SimpleMessage(FILE_NOT_FOUND);
   }
 
   @Override
-  public boolean isSupported(String filePath) {
+  public boolean isSupported(RequestTarget requestTarget) {
     return true;
   }
 }

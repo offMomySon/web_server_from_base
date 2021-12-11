@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import reader.httpspec.startLine.HttpMethod;
 import reader.httpspec.startLine.HttpStartLine;
+import reader.httpspec.startLine.RequestTarget;
 
 @Slf4j
 public class HttpRequest {
@@ -48,9 +49,8 @@ public class HttpRequest {
     return httpBody.getBody();
   }
 
-  public String getRequestTarget() {
-//    return httpStartLine.getRequestTarget();
-    return "temp";
+  public RequestTarget getRequestTarget() {
+    return httpStartLine.getRequestTarget();
   }
 
   public String getRequestVersion() {

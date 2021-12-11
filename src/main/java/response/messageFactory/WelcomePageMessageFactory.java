@@ -1,6 +1,7 @@
 package response.messageFactory;
 
 import config.ConfigManager;
+import reader.httpspec.startLine.RequestTarget;
 import response.message.sender.Message;
 import response.message.content.WelcomePageMessage;
 
@@ -12,12 +13,12 @@ public class WelcomePageMessageFactory implements AbstractMessageFactory {
   }
 
   @Override
-  public Message createMessage(String filePath) {
+  public Message createMessage(RequestTarget requestTarget) {
     return new WelcomePageMessage(configManager);
   }
 
   @Override
-  public boolean isSupported(String filePath) {
-    return configManager.isWelcomePage(filePath);
+  public boolean isSupported(RequestTarget requestTarget) {
+    return configManager.isWelcomePage(requestTarget);
   }
 }
