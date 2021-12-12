@@ -3,7 +3,7 @@ package config.server;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 
 @Getter
 public class BasicConfig {

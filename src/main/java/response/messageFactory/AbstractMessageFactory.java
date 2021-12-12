@@ -1,6 +1,6 @@
 package response.messageFactory;
 
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 import response.message.sender.Message;
 
 public interface AbstractMessageFactory {

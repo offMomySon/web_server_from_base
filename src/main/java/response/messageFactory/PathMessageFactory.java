@@ -2,7 +2,7 @@ package response.messageFactory;
 
 import config.ConfigManager;
 import lombok.extern.slf4j.Slf4j;
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 import response.message.content.DirectoryMessage;
 import response.message.content.FileMessage;
 import response.message.sender.Message;
@@ -10,14 +10,13 @@ import response.message.content.SimpleMessage;
 
 @Slf4j
 public class PathMessageFactory implements AbstractMessageFactory {
-  private final static String FILE_NOT_FOUND = "file not exist";
+  private final static String FILE_NOT_FOUND = "File not exist";
 
   private final ConfigManager configManager = ConfigManager.getInstance();
 
   @Override
   public Message createMessage(RequestTarget requestTarget) {
-    RequestTarget downloadTarget = ConfigManager.getInstance().getDownloadPath();
-    requestTarget = downloadTarget.append(requestTarget);
+    RequestTarget downloadTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(requestTarget);
 
     log.info("FilePath = {}", requestTarget);
 

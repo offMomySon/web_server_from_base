@@ -1,5 +1,5 @@
 {
-  "downloadPath": "src/main/resources/files",
+  "downloadPath": "/Users/jihunoh/IdeaProjects/web_server_from_base/src/main/resources/files",
   "period": 1,
   "count": 1,
   "restrictedFileExtension": [

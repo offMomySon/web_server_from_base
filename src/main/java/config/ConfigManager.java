@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 
 @Getter
 @Slf4j
@@ -36,10 +36,6 @@ public class ConfigManager {
 
   public boolean isWelcomePage(RequestTarget requestTarget) {
     return basicConfig.isWelcomePage(requestTarget);
-  }
-
-  public RequestTarget getDownloadPath() {
-    return RequestTarget.create(downloadConfig.getDownloadPath());
   }
 }
 

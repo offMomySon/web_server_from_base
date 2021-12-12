@@ -32,7 +32,7 @@ public class WelcomePageMessage extends Message {
     content.append("welcome page path : ").append(basicConfig.getWelcomePageURI()).append("</br>");
     content.append("usable thread count : ").append(threadConfig.getUsableThreadCount()).append("</br>");
     content.append("waitable thread count : ").append(threadConfig.getWaitableThreadCount()).append("</br>");
-    content.append("download path : ").append(downloadConfig.getDownloadPath()).append("</br>");
+    content.append("download path : ").append(downloadConfig.getRootPath()).append("</br>");
     content.append("download count : ").append(downloadConfig.getCount()).append("</br>");
     content.append("download period : ").append(downloadConfig.getPeriod()).append("</br>");
     content.append("restricted file extension : ").append(downloadConfig.getRestrictedFileExtension().toString()).append("</br>");

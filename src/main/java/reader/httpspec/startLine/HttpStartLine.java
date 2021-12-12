@@ -2,13 +2,10 @@ package reader.httpspec.startLine;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Stack;
-import java.util.stream.Collectors;
+
+import domain.RequestTarget;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reader.httpspec.HttpRequest;
 
 @Getter
 @Slf4j

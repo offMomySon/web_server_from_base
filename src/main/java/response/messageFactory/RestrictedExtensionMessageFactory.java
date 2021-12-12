@@ -1,7 +1,11 @@
 package response.messageFactory;
 
-import reader.httpspec.startLine.RequestTarget;
+import config.ConfigManager;
+import config.server.download.DownloadConfig;
+import domain.RequestTarget;
 import response.message.sender.Message;
+
+import java.util.Optional;
 
 public class RestrictedExtensionMessageFactory implements AbstractMessageFactory {
 
@@ -13,7 +17,9 @@ public class RestrictedExtensionMessageFactory implements AbstractMessageFactory
 
     @Override
     public boolean isSupported(RequestTarget requestTarget) {
+        DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
 
-        return false;
+
+        return downloadConfig.containsRestrictedFileExtension(requestTarget.getFileExtension());
     }
 }

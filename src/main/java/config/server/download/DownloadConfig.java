@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import config.server.Config;
 import java.util.List;
+import java.util.Set;
+
+import domain.FileExtension;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import domain.RequestTarget;
 
 @Slf4j
 @Getter
@@ -15,15 +19,15 @@ public class DownloadConfig {
   private final String downloadPath;
   private final int period;
   private final int count;
-  private final List<String> restrictedFileExtension;
-  private final List<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps;
-  private final List<PeriodCountConfigAtIp> periodCountConfigAtIps;
+  private final Set<FileExtension> restrictedFileExtension;
+  private final Set<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps;
+  private final Set<PeriodCountConfigAtIp> periodCountConfigAtIps;
 
   @JsonCreator
   public DownloadConfig(@JsonProperty("downloadPath") String downloadPath, @JsonProperty("period") int period, @JsonProperty("count") int count,
-      @JsonProperty("restrictedFileExtension") List<String> restrictedFileExtension,
-      @JsonProperty("restrictedFileExtensionAtIps") List<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps,
-      @JsonProperty("periodCountConfigAtIps") List<PeriodCountConfigAtIp> periodCountConfigAtIps) {
+      @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtension,
+      @JsonProperty("restrictedFileExtensionAtIps") Set<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps,
+      @JsonProperty("periodCountConfigAtIps") Set<PeriodCountConfigAtIp> periodCountConfigAtIps) {
     this.downloadPath = downloadPath;
     this.period = period;
     this.count = count;
@@ -44,6 +48,14 @@ public class DownloadConfig {
     return downloadConfig;
   }
 
+  public RequestTarget getRootPath(){
+    return RequestTarget.create(getDownloadPath());
+  }
+
+  public RequestTarget getResourcePath(RequestTarget resourcePath) {
+    return getRootPath().append(resourcePath);
+  }
+
   public boolean containsIpAddress(String ipAddress) {
     for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
       if (restrictedFileExtensionAtIp.compareIpAddress(ipAddress)) {
@@ -62,7 +74,7 @@ public class DownloadConfig {
     return false;
   }
 
-  public boolean containsRestrictedFileExtension(String fileExtension) {
+  public boolean containsRestrictedFileExtension(FileExtension fileExtension) {
     log.info("containsRestrictedFileExtension = {} ", restrictedFileExtension.contains(fileExtension));
     return restrictedFileExtension.contains(fileExtension);
   }

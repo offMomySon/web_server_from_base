@@ -1,6 +1,6 @@
 package response.messageFactory;
 
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 import response.message.sender.Message;
 import response.message.content.SimpleMessage;
 import thread.snapshot.ThreadStatusSnapShot;

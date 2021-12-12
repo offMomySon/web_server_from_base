@@ -2,9 +2,8 @@ package response.messageFactory;
 
 import java.util.List;
 
-import reader.httpspec.startLine.RequestTarget;
+import domain.RequestTarget;
 import response.message.sender.Message;
-import response.messageFactory.AbstractMessageFactory;
 
 public class CompositeMessageFactory implements AbstractMessageFactory {
   private final List<AbstractMessageFactory> factories;

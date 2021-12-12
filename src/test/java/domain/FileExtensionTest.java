@@ -1,18 +1,28 @@
-package reader.httpspec.startLine;
+package domain;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import util.FileExtension;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import domain.FileExtension;
 
 class FileExtensionTest {
+
+    @DisplayName("확장자의 첫 문자는 '.' 입니다.")
+    @Test
+    void argumentNotNull(){
+        //given
+        String nullExtension = null;
+
+        //when
+        Throwable thrown = Assertions.catchThrowable(()->{
+            new FileExtension(nullExtension);
+        });
+
+        //then
+        Assertions.assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+    }
 
     @DisplayName("확장자의 첫 문자는 '.' 입니다.")
     @ParameterizedTest
