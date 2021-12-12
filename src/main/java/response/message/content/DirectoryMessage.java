@@ -8,6 +8,7 @@ import response.message.sender.Message;
 public class DirectoryMessage extends Message {
   private final String filePath;
 
+  // [jihun]
   //Domain 객체가 RequestTarget 으로 변했는데 어떻게 처리해야하지.
   // 이것도 변경해야 할 거 같은데.
   // 일단 String 으로..

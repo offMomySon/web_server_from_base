@@ -45,10 +45,14 @@ public class RequestTarget {
         return new RequestTarget(value);
     }
 
+    // [jihun]
     //generic 으로 더 유연하게 풀 수 있지 않을까?
+    //RequestTarget 대신 string 을 받는다거나.
     public RequestTarget append(RequestTarget requestTarget){
+        // [jihun]
         // 여기까지 null 방어할 필요가 있을까?
-        // 어차피 RequestTarget 을 다시 만들면서
+        // 어차피 RequestTarget 을 다시 만들면서 null 검사가 될텐데..
+        // 하지만 로직 타기전에 null 검사가 좋기는 할듯
         if(Objects.isNull(requestTarget)){
             throw new IllegalArgumentException("argument 가 null 이면 안됩니다.");
         }
@@ -72,7 +76,9 @@ public class RequestTarget {
         return Files.isDirectory(value);
     }
 
+    // [jihun]
     // 얘도 테스트 케이스 만들 필요가 있을까?
+    // 단순히 DownloadTarget 으로 매핑한는 건데
     public DownloadTarget getDownloadTarget() {
         return Optional.of(value.toString())
                 .map(value->Path.of(value.toString()))
@@ -80,7 +86,7 @@ public class RequestTarget {
                 .orElseThrow(()-> {throw new IllegalArgumentException("DownloadTarget 생성실패");});
     }
 
-    //네이밍이 이게 맞나?
+    //네이밍이 별로인듯..
     public FileExtension getFileExtension(){
         return Optional.of(value.getFileName().toString())
                 .map(s -> s.substring(s.lastIndexOf(".")))
@@ -122,8 +128,10 @@ public class RequestTarget {
         return Objects.hash(value);
     }
 
+    // [jihun]
     // param 의 string 으로 던져줘야하는 경우가 있어서 이렇게 처리.
     // domain 객체를 덜 만들어줘서 그런가..
+    // 모든 로직에서 도메인 객체 그대로 사용해주는게 좋을거 같은데..
     @Override
     public String toString() {
         return value.toString();
