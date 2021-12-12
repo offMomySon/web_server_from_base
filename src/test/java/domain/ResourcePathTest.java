@@ -1,6 +1,5 @@
 package domain;
 
-import config.ConfigManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,9 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-class RequestTargetTest {
+class ResourcePathTest {
 
     @DisplayName("생성시, 인자가 null 이면 안됩니다.")
     @Test
@@ -23,13 +21,12 @@ class RequestTargetTest {
 
         //when
         Throwable throwable = Assertions.catchThrowable(() -> {
-            RequestTarget requestTarget = RequestTarget.create(nullPath);
+            ResourcePath resourcePath = ResourcePath.create(nullPath);
         });
 
         //then
         Assertions.assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
     }
-
 
 
     @DisplayName("생성시, 인자로 받은 Path 내에서만 탐색해야 합니다.")
@@ -39,7 +36,7 @@ class RequestTargetTest {
         //given
         //when
         Throwable throwable = Assertions.catchThrowable(() -> {
-            RequestTarget requestTarget = RequestTarget.create(path);
+            ResourcePath resourcePath = ResourcePath.create(path);
         });
 
         //then
@@ -52,7 +49,7 @@ class RequestTargetTest {
     void possiblePath(String path) {
         //given
         //when
-        RequestTarget requestTarget = RequestTarget.create(path);
+        ResourcePath resourcePath = ResourcePath.create(path);
 
         //then
         Assertions.assertThat(true).as("failure - should be true").isTrue();
@@ -63,11 +60,11 @@ class RequestTargetTest {
     @CsvSource(value = {"/file/image.jpg, .jpg", "file/image.jpg, .jpg", "file/image.test.jpg, .jpg", "file//depth1///tem.jpg, .jpg"})
     void getFileExteinsion(String path, String extension) {
         //given
-        RequestTarget requestTarget = RequestTarget.create(path);
+        ResourcePath resourcePath = ResourcePath.create(path);
         FileExtension expected = new FileExtension(extension);
 
         //when
-        FileExtension actual = requestTarget.createFileExtension();
+        FileExtension actual = resourcePath.createFileExtension();
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -75,21 +72,21 @@ class RequestTargetTest {
 
     @DisplayName("시스템 내에 존재하는 파일이면 True 값을 출력해야합니다.")
     @ParameterizedTest
-    @ValueSource(strings={"/textFiles/test1.txt","/textFiles/test2.bat"})
-    void exists(String resourcePath) {
+    @ValueSource(strings = {"/textFiles/test1.txt", "/textFiles/test2.bat"})
+    void exists(String relativePath) {
         //given
-        RequestTarget fullRequestTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath));
-        Path newFile = Paths.get(ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath)).toString());
+        Path newFile = ResourcePath.create(relativePath).createDownloadFile().toPath();
         try {
             Files.createFile(newFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ResourcePath resourcePath = ResourcePath.create(relativePath);
 
         //when
-        boolean actual = fullRequestTarget.exists();
+        boolean actual = resourcePath.exists();
 
-        //then
+        //then\
         Assertions.assertThat(actual).isEqualTo(true);
         try {
             Files.delete(newFile);
@@ -100,20 +97,20 @@ class RequestTargetTest {
 
     @DisplayName("파일이면 True 값을 출력해야 합니다.")
     @ParameterizedTest
-    @ValueSource(strings={"/textFiles/test1_file.txt","/textFiles/test2_file.bat"})
-    void isFile(String resourcePath) {
+    @ValueSource(strings = {"/textFiles/test1_file.txt", "/textFiles/test2_file.bat"})
+    void isFile(String relativePath) {
         //given
-        Path newFile = Paths.get(ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath)).toString());
+        Path newFile = ResourcePath.create(relativePath).createDownloadFile().toPath();
         try {
             Files.createFile(newFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        RequestTarget fullRequestTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath));
+        ResourcePath resourcePath = ResourcePath.create(relativePath);
 
         //when
-        boolean actual = fullRequestTarget.isFile();
+        boolean actual = resourcePath.isFile();
 
         try {
             Files.delete(newFile);
@@ -127,20 +124,20 @@ class RequestTargetTest {
 
     @DisplayName("디렉토리면 True 값을 출력해야 합니다.")
     @ParameterizedTest
-    @ValueSource(strings={"/test1/","/test2"})
-    void isDirectory(String resourcePath) {
+    @ValueSource(strings = {"/test1/", "/test2"})
+    void isDirectory(String relativePath) {
         //given
-        Path newDirectory = Paths.get(ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath)).toString());
+        Path newDirectory = ResourcePath.create(relativePath).createDownloadFile().toPath();
         try {
             Files.createDirectories(newDirectory);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        RequestTarget fullRequestTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(RequestTarget.create(resourcePath));
+        ResourcePath fullResourcePath = ResourcePath.create(relativePath);
 
         //when
-        boolean actual = fullRequestTarget.isDirectory();
+        boolean actual = fullResourcePath.isDirectory();
 
         try {
             Files.delete(newDirectory);
@@ -157,11 +154,11 @@ class RequestTargetTest {
     @ValueSource(strings = {"/file/test.jpg"})
     void equals(String path) {
         //given
-        RequestTarget requestTarget_1 = RequestTarget.create(path);
-        RequestTarget requestTarget_2 = RequestTarget.create(path);
+        ResourcePath resourcePath_1 = ResourcePath.create(path);
+        ResourcePath resourcePath_2 = ResourcePath.create(path);
 
         //when
-        boolean actual = requestTarget_1.equals(requestTarget_2);
+        boolean actual = resourcePath_1.equals(resourcePath_2);
 
         //then
         Assertions.assertThat(actual).isTrue();
@@ -172,11 +169,11 @@ class RequestTargetTest {
     @CsvSource(value = {"/file/, test.jpg, /file/test.jpg"})
     void append(String basePath, String targetPath, String resultPath) {
         //given
-        RequestTarget appendedTarget = RequestTarget.create(basePath).append(RequestTarget.create(targetPath));
-        RequestTarget fullRequestTarget = RequestTarget.create(resultPath);
+        ResourcePath appendedTarget = ResourcePath.create(basePath).append(ResourcePath.create(targetPath));
+        ResourcePath fullResourcePath = ResourcePath.create(resultPath);
 
         //when
-        boolean actual = appendedTarget.equals(fullRequestTarget);
+        boolean actual = appendedTarget.equals(fullResourcePath);
 
         //then
         Assertions.assertThat(actual).isTrue();

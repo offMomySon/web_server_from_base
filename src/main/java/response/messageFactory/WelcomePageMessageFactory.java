@@ -1,24 +1,24 @@
 package response.messageFactory;
 
 import config.ConfigManager;
-import domain.RequestTarget;
-import response.message.sender.Message;
+import domain.ResourcePath;
 import response.message.content.WelcomePageMessage;
+import response.message.sender.Message;
 
 public class WelcomePageMessageFactory implements AbstractMessageFactory {
-  private final ConfigManager configManager;
+    private final ConfigManager configManager;
 
-  public WelcomePageMessageFactory(ConfigManager configManager) {
-    this.configManager = configManager;
-  }
+    public WelcomePageMessageFactory(ConfigManager configManager) {
+        this.configManager = configManager;
+    }
 
-  @Override
-  public Message createMessage(RequestTarget requestTarget) {
-    return new WelcomePageMessage(configManager);
-  }
+    @Override
+    public Message createMessage(ResourcePath resourcePath) {
+        return new WelcomePageMessage(configManager);
+    }
 
-  @Override
-  public boolean isSupported(RequestTarget requestTarget) {
-    return configManager.isWelcomePage(requestTarget);
-  }
+    @Override
+    public boolean isSupported(ResourcePath resourcePath) {
+        return configManager.isWelcomePage(resourcePath);
+    }
 }

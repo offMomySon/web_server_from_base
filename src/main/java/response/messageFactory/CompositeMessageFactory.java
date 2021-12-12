@@ -1,28 +1,28 @@
 package response.messageFactory;
 
-import java.util.List;
-
-import domain.RequestTarget;
+import domain.ResourcePath;
 import response.message.sender.Message;
 
+import java.util.List;
+
 public class CompositeMessageFactory implements AbstractMessageFactory {
-  private final List<AbstractMessageFactory> factories;
+    private final List<AbstractMessageFactory> factories;
 
-  public CompositeMessageFactory(List<AbstractMessageFactory> factories) {
-    this.factories = factories;
-  }
+    public CompositeMessageFactory(List<AbstractMessageFactory> factories) {
+        this.factories = factories;
+    }
 
-  @Override
-  public Message createMessage(RequestTarget requestTarget) {
-    return factories.stream()
-        .filter(factory -> factory.isSupported(requestTarget))
-        .findFirst()
-        .map(factory -> factory.createMessage(requestTarget))
-        .orElseThrow();
-  }
+    @Override
+    public Message createMessage(ResourcePath resourcePath) {
+        return factories.stream()
+                .filter(factory -> factory.isSupported(resourcePath))
+                .findFirst()
+                .map(factory -> factory.createMessage(resourcePath))
+                .orElseThrow();
+    }
 
-  @Override
-  public boolean isSupported(RequestTarget requestTarget) {
-    return factories.stream().anyMatch(factory -> factory.isSupported(requestTarget));
-  }
+    @Override
+    public boolean isSupported(ResourcePath resourcePath) {
+        return factories.stream().anyMatch(factory -> factory.isSupported(resourcePath));
+    }
 }

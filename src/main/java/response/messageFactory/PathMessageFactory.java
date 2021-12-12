@@ -1,38 +1,38 @@
 package response.messageFactory;
 
 import config.ConfigManager;
+import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
-import domain.RequestTarget;
 import response.message.content.DirectoryMessage;
 import response.message.content.FileMessage;
-import response.message.sender.Message;
 import response.message.content.SimpleMessage;
+import response.message.sender.Message;
 
 @Slf4j
 public class PathMessageFactory implements AbstractMessageFactory {
-  private final static String FILE_NOT_FOUND = "File not exist";
+    private final static String FILE_NOT_FOUND = "File not exist";
 
-  private final ConfigManager configManager = ConfigManager.getInstance();
+    private final ConfigManager configManager = ConfigManager.getInstance();
 
-  @Override
-  public Message createMessage(RequestTarget requestTarget) {
-    RequestTarget downloadTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(requestTarget);
+    @Override
+    public Message createMessage(ResourcePath resourcePath) {
+        ResourcePath downloadTarget = ConfigManager.getInstance().getDownloadConfig().getResourcePath(resourcePath);
 
-    log.info("FilePath = {}", requestTarget);
+        log.info("FilePath = {}", resourcePath);
 
-    if (requestTarget.exists() && requestTarget.isFile()) {
-      return new FileMessage(requestTarget.toString());
+        if (resourcePath.exists() && resourcePath.isFile()) {
+            return new FileMessage(resourcePath.toString());
+        }
+
+        if (resourcePath.exists() && resourcePath.isDirectory()) {
+            return new DirectoryMessage(resourcePath.toString());
+        }
+
+        return new SimpleMessage(FILE_NOT_FOUND);
     }
 
-    if (requestTarget.exists() && requestTarget.isDirectory()) {
-      return new DirectoryMessage(requestTarget.toString());
+    @Override
+    public boolean isSupported(ResourcePath resourcePath) {
+        return true;
     }
-
-    return new SimpleMessage(FILE_NOT_FOUND);
-  }
-
-  @Override
-  public boolean isSupported(RequestTarget requestTarget) {
-    return true;
-  }
 }

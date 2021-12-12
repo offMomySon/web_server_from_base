@@ -1,26 +1,26 @@
 package response.messageFactory;
 
-import domain.RequestTarget;
-import response.message.sender.Message;
+import domain.ResourcePath;
 import response.message.content.SimpleMessage;
+import response.message.sender.Message;
 import thread.snapshot.ThreadStatusSnapShot;
 
 public class ThreadMessageFactory implements AbstractMessageFactory {
-  private final static String NOT_AVAILABLE_THREAD = "not available thread.";
+    private final static String NOT_AVAILABLE_THREAD = "not available thread.";
 
-  private ThreadStatusSnapShot statusSnapShot;
+    private ThreadStatusSnapShot statusSnapShot;
 
-  public ThreadMessageFactory(ThreadStatusSnapShot statusSnapShot) {
-    this.statusSnapShot = statusSnapShot;
-  }
+    public ThreadMessageFactory(ThreadStatusSnapShot statusSnapShot) {
+        this.statusSnapShot = statusSnapShot;
+    }
 
-  @Override
-  public Message createMessage(RequestTarget requestTarget) {
-    return new SimpleMessage(NOT_AVAILABLE_THREAD);
-  }
+    @Override
+    public Message createMessage(ResourcePath resourcePath) {
+        return new SimpleMessage(NOT_AVAILABLE_THREAD);
+    }
 
-  @Override
-  public boolean isSupported(RequestTarget requestTarget) {
-    return !statusSnapShot.isAvailable();
-  }
+    @Override
+    public boolean isSupported(ResourcePath resourcePath) {
+        return !statusSnapShot.isAvailable();
+    }
 }

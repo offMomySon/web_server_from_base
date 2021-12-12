@@ -1,38 +1,38 @@
 package reader.httpspec.startLine;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
-import domain.RequestTarget;
+import domain.ResourcePath;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 
 @Getter
 @Slf4j
 public class HttpStartLine {
-  public static final RequestTarget EMPTY_REQUEST_TARGET = RequestTarget.create("");
+    public static final ResourcePath EMPTY_REQUEST_TARGET = ResourcePath.create("");
 
-  private final HttpMethod httpMethod;
-  private final RequestTarget requestTarget;
-  private final String httpVersion;
+    private final HttpMethod httpMethod;
+    private final ResourcePath resourcePath;
+    private final String httpVersion;
 
-  public HttpStartLine(BufferedReader reader) {
-    try {
-      log.info("Read get startLine");
-      String startLine = reader.readLine();
-      log.info("StartLine : " + startLine);
+    public HttpStartLine(BufferedReader reader) {
+        try {
+            log.info("Read get startLine");
+            String startLine = reader.readLine();
+            log.info("StartLine : " + startLine);
 
-      String[] splitedStartLine = startLine.split(" ");
-      httpMethod = HttpMethod.valueOf(splitedStartLine[0].trim());
-      requestTarget = RequestTarget.create(splitedStartLine[1].trim());
-      httpVersion = splitedStartLine[2].trim();
+            String[] splitedStartLine = startLine.split(" ");
+            httpMethod = HttpMethod.valueOf(splitedStartLine[0].trim());
+            resourcePath = ResourcePath.create(splitedStartLine[1].trim());
+            httpVersion = splitedStartLine[2].trim();
 
-      log.debug("HttpMethod : " + httpMethod);
-      log.debug("RequestTarget : " + requestTarget);
-      log.debug("HttpVersion : " + httpVersion);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+            log.debug("HttpMethod : " + httpMethod);
+            log.debug("RequestTarget : " + resourcePath);
+            log.debug("HttpVersion : " + httpVersion);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-  }
 
 }

@@ -1,11 +1,9 @@
 package response.messageFactory;
 
-import domain.RequestTarget;
+import domain.ResourcePath;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RestrictedExtensionMessageFactoryTest {
 
@@ -24,12 +22,12 @@ class RestrictedExtensionMessageFactoryTest {
     @DisplayName("제한되어있는 파일 확장자는 True 가 반환됩니다.")
     void isSupported() {
         //given
-        RequestTarget requestTarget = RequestTarget.create("test.jpg");
+        ResourcePath resourcePath = ResourcePath.create("test.jpg");
 
         RestrictedExtensionMessageFactory restrictedExtensionMessageFactory = new RestrictedExtensionMessageFactory();
 
         //when
-        boolean actual = restrictedExtensionMessageFactory.isSupported(requestTarget);
+        boolean actual = restrictedExtensionMessageFactory.isSupported(resourcePath);
 
         //then
         Assertions.assertThat(actual).isTrue();
