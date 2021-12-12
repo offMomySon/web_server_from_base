@@ -74,6 +74,9 @@ public class DownloadConfig {
     return false;
   }
 
+  // config 값을 가지는 객체지만.
+  // 내부적으로 코드를 가지는게 좋다
+  // 코드 파편화 제한
   public boolean containsRestrictedFileExtension(FileExtension fileExtension) {
     log.info("containsRestrictedFileExtension = {} ", restrictedFileExtension.contains(fileExtension));
     return restrictedFileExtension.contains(fileExtension);

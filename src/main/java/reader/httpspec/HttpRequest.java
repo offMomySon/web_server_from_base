@@ -23,7 +23,7 @@ public class HttpRequest {
   private final BufferedReader reader;
 
   public HttpRequest(InputStream inputStream) {
-    // [jihun]
+    // Todo]
     // http read 할떄 BufferedReader 을 httpStartLine,httpHeader, httpBody 에서 따로 만들면 읽지못해서 여기서 BufferedReader 를 생성함.
     reader = createReader(inputStream);
 

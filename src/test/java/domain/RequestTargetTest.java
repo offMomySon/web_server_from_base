@@ -67,7 +67,7 @@ class RequestTargetTest {
         FileExtension expected = new FileExtension(extension);
 
         //when
-        FileExtension actual = requestTarget.getFileExtension();
+        FileExtension actual = requestTarget.createFileExtension();
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);

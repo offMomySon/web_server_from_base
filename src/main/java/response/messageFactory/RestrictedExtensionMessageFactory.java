@@ -5,8 +5,6 @@ import config.server.download.DownloadConfig;
 import domain.RequestTarget;
 import response.message.sender.Message;
 
-import java.util.Optional;
-
 public class RestrictedExtensionMessageFactory implements AbstractMessageFactory {
 
     @Override
@@ -20,6 +18,6 @@ public class RestrictedExtensionMessageFactory implements AbstractMessageFactory
         DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
 
 
-        return downloadConfig.containsRestrictedFileExtension(requestTarget.getFileExtension());
+        return downloadConfig.containsRestrictedFileExtension(requestTarget.createFileExtension());
     }
 }
