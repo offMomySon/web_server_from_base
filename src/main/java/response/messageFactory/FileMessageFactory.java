@@ -11,7 +11,7 @@ public class FileMessageFactory implements AbstractMessageFactory {
     public Message createMessage(ResourcePath resourcePath) {
         File downloadFile = resourcePath.createDownloadFile();
 
-        return new FileMessage(downloadFile);
+        return new FileMessage(resourcePath.createFileExtension(), downloadFile);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class PathMessageFactory implements AbstractMessageFactory {
         log.info("FilePath = {}", resourcePath);
 
         if (resourcePath.exists() && resourcePath.isFile()) {
-            return new FileMessage(resourcePath.toString());
+            return new FileMessage(resourcePath.createFileExtension(), resourcePath.createDownloadFile());
         }
 
         if (resourcePath.exists() && resourcePath.isDirectory()) {

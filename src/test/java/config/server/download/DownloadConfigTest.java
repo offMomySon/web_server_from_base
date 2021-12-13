@@ -4,10 +4,7 @@ import domain.FileExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DownloadConfigTest {
 
@@ -16,7 +13,7 @@ class DownloadConfigTest {
         DownloadConfig downloadConfig = DownloadConfig.create();
         Set<FileExtension> restrictedFileExtension = downloadConfig.getRestrictedFileExtension();
 
-        for(FileExtension fileExtension : restrictedFileExtension){
+        for (FileExtension fileExtension : restrictedFileExtension) {
             System.out.println(fileExtension.toString());
         }
     }
@@ -27,7 +24,7 @@ class DownloadConfigTest {
         DownloadConfig downloadConfig = DownloadConfig.create();
         Set<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps = downloadConfig.getRestrictedFileExtensionAtIps();
 
-        for(RestrictedFileExtensionAtIp restrictedFileExtensionAtIp :restrictedFileExtensionAtIps){
+        for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
             System.out.println(restrictedFileExtensionAtIp.getRestrictedFileExtension());
         }
     }

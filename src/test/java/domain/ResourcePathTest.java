@@ -61,7 +61,7 @@ class ResourcePathTest {
     void getFileExteinsion(String path, String extension) {
         //given
         ResourcePath resourcePath = ResourcePath.create(path);
-        FileExtension expected = new FileExtension(extension);
+        FileExtension expected = FileExtension.parse(extension);
 
         //when
         FileExtension actual = resourcePath.createFileExtension();

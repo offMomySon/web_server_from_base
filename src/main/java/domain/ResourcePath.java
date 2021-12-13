@@ -95,7 +95,7 @@ public class ResourcePath {
         String fileName = value.getFileName().toString();
         fileName = fileName.substring(fileName.lastIndexOf("."));
 
-        return new FileExtension(fileName);
+        return FileExtension.parse(fileName);
     }
 
     public File createDownloadFile() {
