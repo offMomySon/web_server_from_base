@@ -12,6 +12,7 @@ import thread.snapshot.ThreadStatusSnapShot;
 // concrete 한 runnable 제공하는 책임/역할 로 변경됨.. 이걸로 충분한가?
 @Slf4j
 public class ThreadManipulator {
+  // Todo]
   // waitIfNotExistLeftThread() ->  runWithOccupiedWorkerThread() 순서 보장을 위해 ,
   // ConfigManager 를 전역으로 가져올 수 있게 했다.
 
