@@ -13,12 +13,12 @@ public class WelcomePageMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
+    public Message createMessage(String hostAddress, ResourcePath resourcePath) {
         return new WelcomePageMessage(configManager);
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
+    public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
         return configManager.isWelcomePage(resourcePath);
     }
 }

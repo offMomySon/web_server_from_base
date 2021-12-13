@@ -13,16 +13,16 @@ public class CompositeMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
+    public Message createMessage(String hostAddress, ResourcePath resourcePath) {
         return factories.stream()
-                .filter(factory -> factory.isSupported(resourcePath))
+                .filter(factory -> factory.isSupported(hostAddress, resourcePath))
                 .findFirst()
-                .map(factory -> factory.createMessage(resourcePath))
+                .map(factory -> factory.createMessage(hostAddress, resourcePath))
                 .orElseThrow();
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
-        return factories.stream().anyMatch(factory -> factory.isSupported(resourcePath));
+    public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
+        return factories.stream().anyMatch(factory -> factory.isSupported(hostAddress, resourcePath));
     }
 }

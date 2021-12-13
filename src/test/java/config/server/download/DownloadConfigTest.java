@@ -1,31 +1,56 @@
 package config.server.download;
 
+import config.ConfigManager;
 import domain.FileExtension;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class DownloadConfigTest {
 
-    @Test
-    void create() {
-        DownloadConfig downloadConfig = DownloadConfig.create();
-        Set<FileExtension> restrictedFileExtension = downloadConfig.getRestrictedFileExtension();
-
-        for (FileExtension fileExtension : restrictedFileExtension) {
-            System.out.println(fileExtension.toString());
-        }
-    }
-
     @DisplayName("config file 로 부터 FileExtension 을 읽어 옵니다.")
     @Test
-    void create2() {
-        DownloadConfig downloadConfig = DownloadConfig.create();
-        Set<RestrictedFileExtensionAtIp> restrictedFileExtensionAtIps = downloadConfig.getRestrictedFileExtensionAtIps();
+    void create() {
+        //given
+        //when
+        Throwable actual = Assertions.catchThrowable(() -> {
+            DownloadConfig downloadConfig = DownloadConfig.create();
+        });
 
-        for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
-            System.out.println(restrictedFileExtensionAtIp.getRestrictedFileExtension());
-        }
+        //then
+        Assertions.assertThat(actual).isNull();
+    }
+
+
+    @DisplayName("제한된 파일확장 자이면 true 를 반환해야 합니다.")
+    @ParameterizedTest
+    @ValueSource(strings = {".jpg", ".class"})
+    void containsRestrictedFileExtension(String restrictedFileExtension) {
+        //given
+        DownloadConfig downloadConfig = DownloadConfig.create();
+        FileExtension fileExtension = FileExtension.parse(restrictedFileExtension);
+
+        //when
+        boolean actual = downloadConfig.containsRestrictedFileExtension(fileExtension);
+
+        //then
+        Assertions.assertThat(actual).isTrue();
+    }
+
+    @DisplayName("특정 IP 의 제한된 파일확장 자이면 true 를 반환해야 합니다.")
+    @ParameterizedTest
+    @CsvSource(value = {"192.168.0.1, .jpg", "192.168.0.2, .class"})
+    void containsRestrictedFileExtensionAtIp(String hostAddress, String extension) {
+        //given
+        FileExtension fileExtension = FileExtension.parse(extension);
+
+        //when
+        boolean actual = ConfigManager.getInstance().getDownloadConfig().containsRestrictedFileExtensionAtIp(hostAddress, fileExtension);
+
+        //then
+        Assertions.assertThat(actual).isTrue();
     }
 }

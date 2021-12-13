@@ -15,12 +15,12 @@ public class ThreadMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
+    public Message createMessage(String hostAddress, ResourcePath resourcePath) {
         return new SimpleMessage(NOT_AVAILABLE_THREAD);
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
+    public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
         return !statusSnapShot.isAvailable();
     }
 }

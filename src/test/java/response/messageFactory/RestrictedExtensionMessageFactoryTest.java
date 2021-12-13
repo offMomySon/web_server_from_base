@@ -27,7 +27,7 @@ class RestrictedExtensionMessageFactoryTest {
         RestrictedExtensionMessageFactory restrictedExtensionMessageFactory = new RestrictedExtensionMessageFactory();
 
         //when
-        boolean actual = restrictedExtensionMessageFactory.isSupported(resourcePath);
+        boolean actual = restrictedExtensionMessageFactory.isSupported("", resourcePath);
 
         //then
         Assertions.assertThat(actual).isTrue();

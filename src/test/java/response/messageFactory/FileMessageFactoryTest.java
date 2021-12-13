@@ -28,7 +28,7 @@ class FileMessageFactoryTest {
         FileMessageFactory fileMessageFactory = new FileMessageFactory();
 
         //when
-        boolean actual = fileMessageFactory.isSupported(ResourcePath.create(relativePath));
+        boolean actual = fileMessageFactory.isSupported("", ResourcePath.create(relativePath));
 
         try {
             Files.delete(newFile);
@@ -57,7 +57,7 @@ class FileMessageFactoryTest {
         FileMessageFactory fileMessageFactory = new FileMessageFactory();
 
         //when
-        Message message = fileMessageFactory.createMessage(resourcePath);
+        Message message = fileMessageFactory.createMessage("", resourcePath);
 
         try {
             Files.delete(newFile);

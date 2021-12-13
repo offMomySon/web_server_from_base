@@ -64,18 +64,15 @@ public class DownloadConfig {
         return false;
     }
 
-    public boolean containsRestrictedFileExtensionAtIp(String ipAddress, String fileExtension) {
+    public boolean containsRestrictedFileExtensionAtIp(String hostAddress, FileExtension fileExtension) {
         for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
-            if (restrictedFileExtensionAtIp.compareIpAddress(ipAddress) && restrictedFileExtensionAtIp.containsRestrictedFileExtension(fileExtension)) {
+            if (restrictedFileExtensionAtIp.compareIpAddress(hostAddress) && restrictedFileExtensionAtIp.containsRestrictedFileExtension(fileExtension)) {
                 return true;
             }
         }
         return false;
     }
 
-    // config 값을 가지는 객체지만.
-    // 내부적으로 코드를 가지는게 좋다
-    // 코드 파편화 제한
     public boolean containsRestrictedFileExtension(FileExtension fileExtension) {
         log.info("containsRestrictedFileExtension = {} ", restrictedFileExtension.contains(fileExtension));
         return restrictedFileExtension.contains(fileExtension);
