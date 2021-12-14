@@ -1,10 +1,18 @@
 import config.ConfigManager;
+import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import reader.httpspec.HttpRequest;
+import response.message.sender.Message;
+import response.messageFactory.*;
+import thread.ThreadTasker;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 public class Server {
@@ -24,8 +32,35 @@ public class Server {
         }
     }
 
+    private static void sendMessage(Socket socket, Message message) {
+        String content = message.create();
+
+        try {
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
+            bufferedOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
+            bufferedOutputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void start() {
+        ThreadTasker threadTasker = new ThreadTasker();
+
+        Supplier<AbstractMessageFactory> mainThreadFactoryCreator = () -> new CompositeMessageFactory(List.of(
+                new WelcomeMessageFactory(),
+                new DirectoryMessageFactory(),
+                new FilteredMessageFactory(),
+                new ThreadNotExistMessageFactory(threadTasker.createStatusSnapShot())
+        ));
+
+        AbstractMessageFactory workerThreadMessageFactory = new CompositeMessageFactory(List.of(
+                new WelcomeMessageFactory(),
+                new FileMessageFactory()
+        ));
+
         Socket socket = UNBOUNDED;
+
         try {
             while (true) {
                 log.info("waiting.. request");
@@ -34,14 +69,23 @@ public class Server {
                 log.info("accept.. request");
                 log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
-                HttpRequest httpRequest = new HttpRequest(socket.getInputStream());
                 String hostAddress = socket.getInetAddress().getHostAddress();
+                ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
 
-                
-//                RequestTargetChecker requestTargetChecker = new OrderedRequestTargetChecker(socket.getInetAddress().getHostAddress()).create();
-//                RequestSender requestSender = requestTargetChecker.messageSend(httpRequest.getRequestTarget());
-//                requestSender.doProcess(httpRequest, socket.getOutputStream());
+                AbstractMessageFactory mainThreadFactory = mainThreadFactoryCreator.get();
+                if (mainThreadFactory.isSupported(hostAddress, resourcePath)) {
 
+                    Message message = mainThreadFactory.createMessage(hostAddress, resourcePath);
+                    sendMessage(socket, message);
+                    socket = UNBOUNDED;
+                    continue;
+                }
+
+                Socket _socket = socket;
+                threadTasker.run(() -> {
+                    Message message = workerThreadMessageFactory.createMessage(hostAddress, resourcePath);
+                    sendMessage(_socket, message);
+                });
 
                 socket = UNBOUNDED;
             }
@@ -57,6 +101,5 @@ public class Server {
             }
         }
     }
-
 
 }

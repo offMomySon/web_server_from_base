@@ -44,7 +44,7 @@ public class ThreadRelatedRequestSender extends RequestSender {
         // 2) check run count -> increase run count 동기화 보장되어야함.
         threadPool.execute(() -> {
             threadTasker.run(() -> {
-                Message message = responserFactory.createMessage(hostAddress, httpRequest.getRequestTarget());
+                Message message = responserFactory.createMessage(hostAddress, httpRequest.getHttpStartLine().getResourcePath());
                 message.create();
             });
         });

@@ -5,12 +5,12 @@ import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 import thread.snapshot.ThreadStatusSnapShot;
 
-public class ThreadMessageFactory implements AbstractMessageFactory {
+public class ThreadNotExistMessageFactory implements AbstractMessageFactory {
     private final static String NOT_AVAILABLE_THREAD = "not available thread.";
 
     private ThreadStatusSnapShot statusSnapShot;
 
-    public ThreadMessageFactory(ThreadStatusSnapShot statusSnapShot) {
+    public ThreadNotExistMessageFactory(ThreadStatusSnapShot statusSnapShot) {
         this.statusSnapShot = statusSnapShot;
     }
 

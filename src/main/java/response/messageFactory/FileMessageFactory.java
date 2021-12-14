@@ -1,14 +1,16 @@
 package response.messageFactory;
 
 import domain.ResourcePath;
+import lombok.extern.slf4j.Slf4j;
 import response.message.content.FileMessage;
 import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 
 import java.io.File;
 
+@Slf4j
 public class FileMessageFactory implements AbstractMessageFactory {
-    private final String FILE_NOT_EXIST_MESSAGE = "존재하지 않는 파일 입니다.";
+    private final String FILE_NOT_EXIST_MESSAGE = "Not exist file.";
 
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {

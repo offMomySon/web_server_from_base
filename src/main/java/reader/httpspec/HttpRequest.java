@@ -1,17 +1,16 @@
 package reader.httpspec;
 
-import domain.ResourcePath;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reader.httpspec.startLine.HttpMethod;
 import reader.httpspec.startLine.HttpStartLine;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
-import java.util.Set;
 
 import static java.lang.Integer.parseInt;
 import static util.IoUtil.createReader;
 
+@Getter
 @Slf4j
 public class HttpRequest {
     private static final String READ_CONTENT_LENGTH = "Content-Length";
@@ -24,7 +23,7 @@ public class HttpRequest {
     private final BufferedReader reader;
 
     public HttpRequest(InputStream inputStream) {
-        // Todo]
+        // Todo
         // http read 할떄 BufferedReader 을 httpStartLine,httpHeader, httpBody 에서 따로 만들면 읽지못해서 여기서 BufferedReader 를 생성함.
         reader = createReader(inputStream);
 
@@ -37,41 +36,5 @@ public class HttpRequest {
         }
 
         log.info("Finish to create HttpRequest");
-    }
-
-    public boolean isExistHttpBody() {
-        return httpBody != HTTP_BODY_NOT_EXIST;
-    }
-
-    public HttpMethod getHttpMethod() {
-        return httpStartLine.getHttpMethod();
-    }
-
-    public String getBody() {
-        return httpBody.getBody();
-    }
-
-    public ResourcePath getRequestTarget() {
-        return httpStartLine.getResourcePath();
-    }
-
-    public String getRequestVersion() {
-        return httpStartLine.getHttpVersion();
-    }
-
-    public String getHeaderValue(String key) {
-        return httpHeader.getValue(key);
-    }
-
-    public Set<String> headerKeySet() {
-        return httpHeader.keySet();
-    }
-
-    public boolean headerContainKey(String key) {
-        return httpHeader.containKey(key);
-    }
-
-    public String getValue(String key) {
-        return httpHeader.getValue(key);
     }
 }
