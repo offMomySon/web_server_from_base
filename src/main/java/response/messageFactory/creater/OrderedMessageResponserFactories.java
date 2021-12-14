@@ -1,6 +1,5 @@
 package response.messageFactory.creater;
 
-import config.ConfigManager;
 import response.messageFactory.*;
 import thread.snapshot.ThreadStatusSnapShot;
 
@@ -9,13 +8,12 @@ import java.util.List;
 public class OrderedMessageResponserFactories {
     private final List<AbstractMessageFactory> factories;
 
-    public OrderedMessageResponserFactories(ThreadStatusSnapShot statusSnapShot, ConfigManager configManager) {
+    public OrderedMessageResponserFactories(ThreadStatusSnapShot statusSnapShot) {
         this.factories = List.of(
                 new ThreadMessageFactory(statusSnapShot),
-                new WelcomePageMessageFactory(configManager),
+                new WelcomePageMessageFactory(),
                 new DirectoryMessageFactory(),
-                new RestrictedExtensionAtIpMessageFactory(),
-                new RestrictedExtensionMessageFactory(),
+                new CompositedFileMessageFactoryWithFilter(new OrderedFileMessageFactoriesWithFilter().create()),
                 new FileMessageFactory());
     }
 

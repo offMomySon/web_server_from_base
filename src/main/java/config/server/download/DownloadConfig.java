@@ -55,9 +55,9 @@ public class DownloadConfig {
         return getRootPath().append(resourcePath);
     }
 
-    public boolean containsIpAddress(String ipAddress) {
+    public boolean containsIpAddress(String hostAddress) {
         for (RestrictedFileExtensionAtIp restrictedFileExtensionAtIp : restrictedFileExtensionAtIps) {
-            if (restrictedFileExtensionAtIp.compareIpAddress(ipAddress)) {
+            if (restrictedFileExtensionAtIp.compareIpAddress(hostAddress)) {
                 return true;
             }
         }

@@ -1,23 +1,26 @@
 package response.messageFactory;
 
 import config.ConfigManager;
-import config.server.download.DownloadConfig;
 import domain.ResourcePath;
 import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 
 public class RestrictedExtensionMessageFactory implements AbstractMessageFactory {
     private final String RESTRICTED_EXTENSION_MESSAGE = "제한된 파일 확장자 입니다.";
+    private final FileMessageFactory fileMessageFactory = new FileMessageFactory();
 
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {
-        return new SimpleMessage(RESTRICTED_EXTENSION_MESSAGE);
+
+        if (ConfigManager.getInstance().getDownloadConfig().containsRestrictedFileExtension(resourcePath.createFileExtension())) {
+            return new SimpleMessage(RESTRICTED_EXTENSION_MESSAGE);
+        }
+
+        return fileMessageFactory.createMessage(hostAddress, resourcePath);
     }
 
     @Override
     public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
-        DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
-
-        return downloadConfig.containsRestrictedFileExtension(resourcePath.createFileExtension());
+        return ConfigManager.getInstance().getDownloadConfig().containsRestrictedFileExtension(resourcePath.createFileExtension());
     }
 }

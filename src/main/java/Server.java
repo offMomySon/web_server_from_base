@@ -35,12 +35,9 @@ public class Server {
                 log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
                 HttpRequest httpRequest = new HttpRequest(socket.getInputStream());
-
-                httpRequest.getRequestTarget();
-
                 String hostAddress = socket.getInetAddress().getHostAddress();
 
-
+                
 //                RequestTargetChecker requestTargetChecker = new OrderedRequestTargetChecker(socket.getInetAddress().getHostAddress()).create();
 //                RequestSender requestSender = requestTargetChecker.messageSend(httpRequest.getRequestTarget());
 //                requestSender.doProcess(httpRequest, socket.getOutputStream());
