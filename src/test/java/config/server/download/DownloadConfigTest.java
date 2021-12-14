@@ -53,4 +53,16 @@ class DownloadConfigTest {
         //then
         Assertions.assertThat(actual).isTrue();
     }
+
+    @DisplayName("특정 IP 의 제한된 파일확장 자이면 true 를 반환해야 합니다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"192.168.0.1", "192.168.0.2"})
+    void containsIpAddress(String hostAddress) {
+        //given
+        //when
+        boolean actual = ConfigManager.getInstance().getDownloadConfig().containsIpAddress(hostAddress);
+
+        //then
+        Assertions.assertThat(actual).isTrue();
+    }
 }

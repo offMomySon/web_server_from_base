@@ -1,12 +1,11 @@
 package response.sender;
 
-import config.ConfigManager;
 import lombok.extern.slf4j.Slf4j;
 import reader.httpspec.HttpRequest;
 import response.message.sender.Message;
 import response.messageFactory.AbstractMessageFactory;
 import response.messageFactory.creater.OrderedMessageResponserFactories;
-import thread.ThreadManipulator;
+import thread.ThreadTasker;
 import thread.snapshot.ThreadStatusSnapShot;
 
 import java.util.concurrent.ExecutorService;
@@ -19,9 +18,9 @@ public class ThreadRelatedRequestSender extends RequestSender {
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public void doProcess(String hostAddress, HttpRequest httpRequest) {
-        ThreadManipulator threadManipulator = new ThreadManipulator();
-        ThreadStatusSnapShot statusSnapShot = threadManipulator.createStatusSnapShot();
-        AbstractMessageFactory responserFactory = new OrderedMessageResponserFactories(statusSnapShot, ConfigManager.getInstance()).create();
+        ThreadTasker threadTasker = new ThreadTasker();
+        ThreadStatusSnapShot statusSnapShot = threadTasker.createStatusSnapShot();
+        AbstractMessageFactory responserFactory = new OrderedMessageResponserFactories(statusSnapShot).create();
 
         //ditto
         // 검사 -> increase wait count 하기 전까지 동기화 해야함.
@@ -44,7 +43,7 @@ public class ThreadRelatedRequestSender extends RequestSender {
         // 1) check run count -> decrease wait count -> increase run count 동기화 보장되어야함.
         // 2) check run count -> increase run count 동기화 보장되어야함.
         threadPool.execute(() -> {
-            threadManipulator.run(() -> {
+            threadTasker.run(() -> {
                 Message message = responserFactory.createMessage(hostAddress, httpRequest.getRequestTarget());
                 message.create();
             });

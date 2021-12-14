@@ -1,7 +1,8 @@
 package thread;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 // 1. value 를 한번 감싸서 동작을 캡슐화하는건 쉬움.
 // 2. Runnable 구문을 ThreadWorker 에 포함시키는걸 생각하기 어렵다.
@@ -13,21 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ThreadWorker {
-  private final int maxValue;
-  private AtomicInteger currentValue = new AtomicInteger();
+    private final int maxValue;
+    private AtomicInteger currentValue = new AtomicInteger();
 
-  public ThreadWorker(int usableThread) {
-    this.maxValue = usableThread;
-  }
+    public ThreadWorker(int usableThread) {
+        this.maxValue = usableThread;
+    }
 
-  public boolean isLeft() {
-    log.info("max = {}, current = {}", maxValue, currentValue);
-    return currentValue.get() < maxValue;
-  }
+    public boolean isLeft() {
+        log.info("max = {}, current = {}", maxValue, currentValue);
+        return currentValue.get() < maxValue;
+    }
 
-  public void runWithOccupied(Runnable runnable) {
-    currentValue.decrementAndGet();
-    runnable.run();
-    currentValue.incrementAndGet();
-  }
+    public void runWithOccupied(Runnable runnable) {
+        currentValue.decrementAndGet();
+        runnable.run();
+        currentValue.incrementAndGet();
+    }
 }
