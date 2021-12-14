@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import reader.httpspec.HttpRequest;
 import response.message.sender.Message;
 import response.messageFactory.*;
+import thread.ThreadTask;
+import thread.ThreadTaskType;
 import thread.ThreadTasker;
 
 import java.io.BufferedOutputStream;
@@ -12,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -69,23 +72,9 @@ public class Server {
                 log.info("accept.. request");
                 log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
 
-                String hostAddress = socket.getInetAddress().getHostAddress();
-                ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
+                ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.get(), workerThreadMessageFactory);
 
-                AbstractMessageFactory mainThreadFactory = mainThreadFactoryCreator.get();
-                if (mainThreadFactory.isSupported(hostAddress, resourcePath)) {
-
-                    Message message = mainThreadFactory.createMessage(hostAddress, resourcePath);
-                    sendMessage(socket, message);
-                    socket = UNBOUNDED;
-                    continue;
-                }
-
-                Socket _socket = socket;
-                threadTasker.run(() -> {
-                    Message message = workerThreadMessageFactory.createMessage(hostAddress, resourcePath);
-                    sendMessage(_socket, message);
-                });
+                threadTasker.run(threadTask);
 
                 socket = UNBOUNDED;
             }
@@ -100,6 +89,23 @@ public class Server {
                 throw new RuntimeException(ioException);
             }
         }
+    }
+
+    private ThreadTask createThreadTask(Socket socket, AbstractMessageFactory mainThreadMessageFactory, AbstractMessageFactory workerThreadMessageFactory) throws IOException {
+        String hostAddress = socket.getInetAddress().getHostAddress();
+        ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
+
+        // 더 좋은 이름 없을까.
+        // thread 관점이라서 runnable 이 좋아보이기는 하는데..
+        Function<AbstractMessageFactory, Runnable> runnableCreator = (messageFactory) -> {
+            Message message = messageFactory.createMessage(hostAddress, resourcePath);
+            return () -> sendMessage(socket, message);
+        };
+
+        if (mainThreadMessageFactory.isSupported(hostAddress, resourcePath)) {
+            return new ThreadTask(ThreadTaskType.MAIN, runnableCreator.apply(mainThreadMessageFactory));
+        }
+        return new ThreadTask(ThreadTaskType.THREAD, runnableCreator.apply(workerThreadMessageFactory));
     }
 
 }
