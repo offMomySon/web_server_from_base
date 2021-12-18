@@ -22,8 +22,8 @@ public class FilteredMessageFactory implements AbstractMessageFactory {
         DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
         FileExtension fileExtension = resourcePath.createFileExtension();
 
-        if (downloadConfig.containsIpAddress(hostAddress)) {
-            if (downloadConfig.containsRestrictedFileExtensionAtIp(hostAddress, fileExtension)) {
+        if (downloadConfig.containsHostAddressAtRestrictedFileExtension(hostAddress)) {
+            if (downloadConfig.containsRestrictedFileExtensionAtHostAddress(hostAddress, fileExtension)) {
                 return true;
             }
             return false;

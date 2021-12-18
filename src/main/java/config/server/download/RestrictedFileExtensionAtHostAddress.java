@@ -10,12 +10,12 @@ import java.util.Set;
 
 @Getter
 @Slf4j
-public class RestrictedFileExtensionAtIp {
+public class RestrictedFileExtensionAtHostAddress {
     private final String ip;
     private final Set<FileExtension> restrictedFileExtension;
 
     @JsonCreator
-    public RestrictedFileExtensionAtIp(@JsonProperty("ip") String ip, @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtension) {
+    public RestrictedFileExtensionAtHostAddress(@JsonProperty("ip") String ip, @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtension) {
         this.ip = ip;
         this.restrictedFileExtension = restrictedFileExtension;
 

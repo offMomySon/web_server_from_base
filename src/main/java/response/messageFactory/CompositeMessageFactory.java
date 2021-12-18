@@ -18,7 +18,7 @@ public class CompositeMessageFactory implements AbstractMessageFactory {
                 .filter(factory -> factory.isSupported(hostAddress, resourcePath))
                 .findFirst()
                 .map(factory -> factory.createMessage(hostAddress, resourcePath))
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("hostAddress = " + hostAddress + ", resourcePath = " + resourcePath));
     }
 
     @Override

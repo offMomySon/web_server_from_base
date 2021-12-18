@@ -1,5 +1,6 @@
 package response.messageFactory;
 
+import config.server.download.DownloadInfo;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import response.message.content.FileMessage;
@@ -7,6 +8,7 @@ import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 
 import java.io.File;
+import java.time.Instant;
 
 @Slf4j
 public class FileMessageFactory implements AbstractMessageFactory {
@@ -17,6 +19,11 @@ public class FileMessageFactory implements AbstractMessageFactory {
         File downloadFile = resourcePath.createDownloadFile();
 
         if (resourcePath.isFile()) {
+            DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
+            log.info("downloadInfo = {}", downloadInfo);
+
+            downloadInfo.addRequestTime(Instant.now());
+
             return new FileMessage(resourcePath.createFileExtension(), downloadFile);
         }
         return new SimpleMessage(FILE_NOT_EXIST_MESSAGE);
