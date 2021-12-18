@@ -29,6 +29,7 @@ public class DownloadConfig {
                           @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtension,
                           @JsonProperty("restrictedFileExtensionAtIps") Set<RestrictedFileExtensionAtHostAddress> restrictedFileExtensionAtHostAddresses,
                           @JsonProperty("downloadRateAtIps") List<DownloadRateAtHostAddress> downloadRateAtHostAddresses) {
+
         this.downloadPath = downloadPath;
         this.downloadRate = downloadRate;
         this.restrictedFileExtension = restrictedFileExtension;
