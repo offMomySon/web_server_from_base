@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -54,7 +55,8 @@ public class Server {
                 new WelcomeMessageFactory(),
                 new DirectoryMessageFactory(),
                 new FilteredMessageFactory(),
-                new ThreadNotExistMessageFactory(threadTasker.createStatusSnapShot())
+                new ThreadNotExistMessageFactory(threadTasker.createStatusSnapShot()),
+                new ExceedDownloadCountMessageFactory()
         ));
 
         AbstractMessageFactory workerThreadMessageFactory = new CompositeMessageFactory(List.of(
@@ -74,7 +76,9 @@ public class Server {
 
                 ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.get(), workerThreadMessageFactory);
 
-                threadTasker.run(threadTask);
+                if (Objects.nonNull(threadTask)) {
+                    threadTasker.run(threadTask);
+                }
 
                 socket = UNBOUNDED;
             }
@@ -95,6 +99,11 @@ public class Server {
         String hostAddress = socket.getInetAddress().getHostAddress();
         ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
 
+        if (resourcePath.getValue().toString().equals("/favicon.ico")) {
+            log.info("return favicon");
+            return null;
+        }
+
         // 더 좋은 이름 없을까.
         // thread 관점이라서 runnable 이 좋아보이기는 하는데..
         Function<AbstractMessageFactory, Runnable> runnableCreator = (messageFactory) -> {
@@ -105,6 +114,7 @@ public class Server {
         if (mainThreadMessageFactory.isSupported(hostAddress, resourcePath)) {
             return new ThreadTask(ThreadTaskType.MAIN, runnableCreator.apply(mainThreadMessageFactory));
         }
+        
         return new ThreadTask(ThreadTaskType.THREAD, runnableCreator.apply(workerThreadMessageFactory));
     }
 

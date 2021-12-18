@@ -8,6 +8,7 @@ import domain.ResourcePath;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -20,25 +21,26 @@ public class DownloadConfig {
     private final DownloadRate downloadRate;
     private final Set<FileExtension> restrictedFileExtension;
     private final Set<RestrictedFileExtensionAtHostAddress> restrictedFileExtensionAtHostAddresses;
-    private final Set<DownloadRateAtIp> downloadRateAtIps;
+    private final List<DownloadRateAtHostAddress> downloadRateAtHostAddresses;
 
     @JsonCreator
     public DownloadConfig(@JsonProperty("downloadPath") String downloadPath,
                           @JsonProperty("downloadRate") DownloadRate downloadRate,
                           @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtension,
                           @JsonProperty("restrictedFileExtensionAtIps") Set<RestrictedFileExtensionAtHostAddress> restrictedFileExtensionAtHostAddresses,
-                          @JsonProperty("downloadRateAtIps") Set<DownloadRateAtIp> downloadRateAtIps) {
+                          @JsonProperty("downloadRateAtIps") List<DownloadRateAtHostAddress> downloadRateAtHostAddresses) {
+
         this.downloadPath = downloadPath;
         this.downloadRate = downloadRate;
         this.restrictedFileExtension = restrictedFileExtension;
         this.restrictedFileExtensionAtHostAddresses = restrictedFileExtensionAtHostAddresses;
-        this.downloadRateAtIps = downloadRateAtIps;
+        this.downloadRateAtHostAddresses = downloadRateAtHostAddresses;
 
         log.info("DownloadPath = {}", downloadPath);
         log.info("DownloadRate = {}", downloadRate);
         log.info("RestrictedFileExtension = {}", restrictedFileExtension);
         log.info("RestrictedFileExtensionAtIpsString = {}", restrictedFileExtensionAtHostAddresses);
-        log.info("PeriodCountConfigAtIps = {}", downloadRateAtIps);
+        log.info("PeriodCountConfigAtIps = {}", downloadRateAtHostAddresses);
     }
 
     public static DownloadConfig create() {
@@ -48,12 +50,23 @@ public class DownloadConfig {
 
     //with? at?
     // 각각의 ip 의 download config 설정들 중에 인자의 hostAddress 가 포함되는지 알고 싶음.
-    public boolean containsHostAddressAtSpecificDownloadConfig(String hostAddress) {
+    public boolean containsDownloadRateInfoAtHostAddress(String hostAddress) {
         if (Objects.isNull(hostAddress)) {
             throw new RuntimeException("인자가 null 이면 안됩니다.");
         }
 
-        return downloadRateAtIps.stream().anyMatch(d -> d.getHostAddress().equals(hostAddress));
+        return downloadRateAtHostAddresses.stream().anyMatch(d -> d.isEqualAtHostAddress(hostAddress));
+    }
+
+    public DownloadRateAtHostAddress getDownloadRateInfoAtHostAddress(String hostAddress) {
+        if (Objects.isNull(hostAddress)) {
+            throw new RuntimeException("인자가 null 이면 안됩니다.");
+        }
+
+        return downloadRateAtHostAddresses.stream()
+                .filter(d -> d.isEqualAtHostAddress(hostAddress))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("hostAddress 에 맞는 downloadRateInfo 가 존재하지 않습니다."));
     }
 
     public ResourcePath getRootPath() {
