@@ -5,7 +5,7 @@ import domain.ResourcePath;
 import response.message.content.WelcomePageMessage;
 import response.message.sender.Message;
 
-public class WelcomePageMessageFactory implements AbstractMessageFactory {
+public class WelcomeMessageFactory implements AbstractMessageFactory {
 
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {

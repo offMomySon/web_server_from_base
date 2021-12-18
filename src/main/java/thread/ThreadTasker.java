@@ -21,13 +21,13 @@ public class ThreadTasker {
     // TODO
     // waitIfNotExistLeftThread() ->  runWithOccupiedWorkerThread() 순서 보장을 위해 beforeWait 를 선언함.
     // 너무 데이터 적인 측면인가?
-    private boolean beforeWaited;
+    private Boolean beforeWaited;
 
     public ThreadTasker() {
         beforeWaited = false;
     }
 
-    private boolean isProcessable() {
+    private boolean isEnableEnqueue() {
         return usableWorker.isLeft() || waitableWorker.isLeft();
     }
 
@@ -61,26 +61,33 @@ public class ThreadTasker {
                     e.printStackTrace();
                 }
             }
+            beforeWaited = true;
         });
 
-        beforeWaited = true;
-    }
-
-    private void runWithOccupiedWorkerThread(Runnable request) {
-        if (!beforeWaited) {
-            throw new RuntimeException("waitIfNotExistLeftThread 를 먼저 수행해야 합니다.");
+        while (!beforeWaited) {
         }
-        usableWorker.runWithOccupied(request);
     }
 
-    public void run(Runnable process) {
+    private void runIfEnableEnqueue(ThreadTask threadTask) {
+        if (!isEnableEnqueue()) {
+            throw new RuntimeException("현재 사용할 수 있는 스레드 큐가 없습니다.");
+        }
         waitIfNotExistLeftThread();
 
-        runWithOccupiedWorkerThread(process);
+        threadTask.run();
+    }
+
+    public void run(ThreadTask threadTask) {
+        if (threadTask.isMainThread()) {
+            threadTask.run();
+            return;
+        }
+
+        runIfEnableEnqueue(threadTask);
     }
 
     public ThreadStatusSnapShot createStatusSnapShot() {
-        boolean processable = isProcessable();
+        boolean processable = isEnableEnqueue();
         return () -> processable;
     }
 }

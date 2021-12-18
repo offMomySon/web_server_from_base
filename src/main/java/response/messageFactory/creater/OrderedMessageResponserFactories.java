@@ -10,10 +10,10 @@ public class OrderedMessageResponserFactories {
 
     public OrderedMessageResponserFactories(ThreadStatusSnapShot statusSnapShot) {
         this.factories = List.of(
-                new ThreadMessageFactory(statusSnapShot),
-                new WelcomePageMessageFactory(),
+                new ThreadNotExistMessageFactory(statusSnapShot),
+                new WelcomeMessageFactory(),
                 new DirectoryMessageFactory(),
-                new CompositedFileMessageFactoryWithFilter(new OrderedFileMessageFactoriesWithFilter().create()),
+                new FilteredMessageFactory(),
                 new FileMessageFactory());
     }
 
