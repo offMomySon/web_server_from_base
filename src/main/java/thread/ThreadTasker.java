@@ -27,8 +27,22 @@ public class ThreadTasker {
         beforeWaited = false;
     }
 
-    private boolean isEnableEnqueue() {
-        return usableWorker.isLeft() || waitableWorker.isLeft();
+    public void run(ThreadTask threadTask) {
+        if (threadTask.isMainThread()) {
+            threadTask.run();
+            return;
+        }
+
+        runIfEnableEnqueue(threadTask);
+    }
+
+    private void runIfEnableEnqueue(ThreadTask threadTask) {
+        if (!isEnableEnqueue()) {
+            throw new RuntimeException("현재 사용할 수 있는 스레드 큐가 없습니다.");
+        }
+        waitIfNotExistLeftThread();
+
+        threadTask.run();
     }
 
     private void waitIfNotExistLeftThread() {
@@ -68,26 +82,12 @@ public class ThreadTasker {
         }
     }
 
-    private void runIfEnableEnqueue(ThreadTask threadTask) {
-        if (!isEnableEnqueue()) {
-            throw new RuntimeException("현재 사용할 수 있는 스레드 큐가 없습니다.");
-        }
-        waitIfNotExistLeftThread();
-
-        threadTask.run();
-    }
-
-    public void run(ThreadTask threadTask) {
-        if (threadTask.isMainThread()) {
-            threadTask.run();
-            return;
-        }
-
-        runIfEnableEnqueue(threadTask);
-    }
-
     public ThreadStatusSnapShot createStatusSnapShot() {
         boolean processable = isEnableEnqueue();
         return () -> processable;
+    }
+
+    private boolean isEnableEnqueue() {
+        return usableWorker.isLeft() || waitableWorker.isLeft();
     }
 }

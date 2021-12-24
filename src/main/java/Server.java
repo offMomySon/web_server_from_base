@@ -1,7 +1,10 @@
 import config.ConfigManager;
+import config.server.download.DownloadInfo;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import reader.httpspec.HttpRequest;
+import response.message.content.FileMessage;
 import response.message.sender.Message;
 import response.messageFactory.*;
 import thread.ThreadTask;
@@ -13,6 +16,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -46,6 +50,14 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void recordDownloadTime(String hostAddress) {
+        DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
+        log.info("downloadInfo = {}", downloadInfo);
+
+        downloadInfo.addRequestTime(Instant.now());
+
     }
 
     public void start() {
@@ -104,18 +116,28 @@ public class Server {
             return null;
         }
 
-        // 더 좋은 이름 없을까.
-        // thread 관점이라서 runnable 이 좋아보이기는 하는데..
-        Function<AbstractMessageFactory, Runnable> runnableCreator = (messageFactory) -> {
-            Message message = messageFactory.createMessage(hostAddress, resourcePath);
-            return () -> sendMessage(socket, message);
-        };
+        Function<AbstractMessageFactory, Runnable> runnableCreator = getRunnableCreator(socket, hostAddress, resourcePath);
 
         if (mainThreadMessageFactory.isSupported(hostAddress, resourcePath)) {
             return new ThreadTask(ThreadTaskType.MAIN, runnableCreator.apply(mainThreadMessageFactory));
         }
-        
+
         return new ThreadTask(ThreadTaskType.THREAD, runnableCreator.apply(workerThreadMessageFactory));
     }
 
+    @NotNull
+    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, String hostAddress, ResourcePath resourcePath) {
+        return (messageFactory) -> {
+            Message message = messageFactory.createMessage(hostAddress, resourcePath);
+
+            if (message instanceof FileMessage) {
+                return () -> {
+                    recordDownloadTime(hostAddress);
+                    sendMessage(socket, message);
+                };
+            }
+
+            return () -> sendMessage(socket, message);
+        };
+    }
 }
