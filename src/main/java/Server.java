@@ -111,11 +111,6 @@ public class Server {
         String hostAddress = socket.getInetAddress().getHostAddress();
         ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
 
-        if (resourcePath.getValue().toString().equals("/favicon.ico")) {
-            log.info("return favicon");
-            return null;
-        }
-
         Function<AbstractMessageFactory, Runnable> runnableCreator = getRunnableCreator(socket, hostAddress, resourcePath);
 
         if (mainThreadMessageFactory.isSupported(hostAddress, resourcePath)) {
