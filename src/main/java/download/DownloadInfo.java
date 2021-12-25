@@ -1,6 +1,8 @@
-package config.server.download;
+package download;
 
 import config.ConfigManager;
+import config.server.download.DownloadConfig;
+import config.server.download.DownloadRate;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -10,54 +12,45 @@ import java.util.*;
 public class DownloadInfo {
     private static final List<DownloadInfo> records = new LinkedList<>();
 
-    // 도메인 객체 필요?
+    // TODO 도메인 객체 필요?
     // inet의 hostAddress 도 리턴값이 string 이니 굳이할 필요 없을것 같다.
     private final String hostAddress;
     private final DownloadRate downloadRate;
+
+    // 자료구조 변경필요.
     private final TreeSet<Instant> downloadTimes = new TreeSet<>();
 
-    public DownloadInfo(String hostAddress) {
+    public DownloadInfo(String hostAddress, DownloadRate downloadRate) {
         if (Objects.isNull(hostAddress)) {
             throw new IllegalArgumentException("hostAddress 가 null 입니다.");
+        }
+        if (Objects.isNull(downloadRate)) {
+            throw new IllegalArgumentException("downloadRate 가 null 입니다.");
         }
 
         this.hostAddress = hostAddress;
+        this.downloadRate = downloadRate;
+    }
 
-        // Todo
+    public static DownloadInfo createDownloadInfo(String hostAddress) {
+        if (Objects.isNull(hostAddress)) {
+            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
+        }
+
         DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
-        if (downloadConfig.containsDownloadRateInfoAtHostAddress(this.hostAddress)) {
-            this.downloadRate = downloadConfig.getDownloadRateInfoAtHostAddress(this.hostAddress).getDownloadRate();
+
+
+        // config 가 없는 상황 고려해야함.
+        DownloadRate downloadRate = null;
+        if (downloadConfig.containsDownloadRateInfoAtHostAddress(hostAddress)) {
+            downloadRate = downloadConfig.getDownloadRateInfoAtHostAddress(hostAddress).getDownloadRate();
         } else {
-            this.downloadRate = downloadConfig.getDownloadRate();
+            downloadRate = downloadConfig.getDownloadRate();
         }
+
+        return new DownloadInfo(hostAddress, downloadRate);
     }
 
-    public static DownloadInfo getDownloadInfoAtHostAddress(String hostAddress) {
-        if (Objects.isNull(hostAddress)) {
-            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
-        }
-
-        for (DownloadInfo record : records) {
-            if (record.isEqualAtHostAddress(hostAddress)) {
-                return record;
-            }
-        }
-
-        DownloadInfo downloadInfo = new DownloadInfo(hostAddress);
-        records.add(downloadInfo);
-
-        return downloadInfo;
-    }
-
-    // Todo
-    // method name 괜찮은가
-    public boolean isEqualAtHostAddress(String hostAddress) {
-        if (Objects.isNull(hostAddress)) {
-            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
-        }
-
-        return this.hostAddress.equals(hostAddress);
-    }
 
     public long getDownloadCountPerPeriod() {
         return downloadRate.getCount();
@@ -67,12 +60,12 @@ public class DownloadInfo {
         return downloadRate.getPeriod();
     }
 
-    public long leftWaitTimeForDownload() {
-        if (downloadRate.getCount() > downloadTimes.size()) {
+    // 디테일한 세부 사항 모두 정책이 필요함.
+    public long getLeftWaitTimeForDownload() {
+        // 책임 넘겨주기
+        if (isPossibleDownload()) {
             return 0;
         }
-
-        removeRequestRecordIfOverPeriod();
 
         // Todo
         // 연산하는 시간 자료형 통일해야 할거 같은데.
@@ -84,7 +77,6 @@ public class DownloadInfo {
 
     public boolean isPossibleDownload() {
         log.info("isPossibleDownload called");
-        removeRequestRecordIfOverPeriod();
 
         if (downloadRate.getCount() > downloadTimes.size()) {
             return true;
@@ -93,19 +85,20 @@ public class DownloadInfo {
         return false;
     }
 
-    public void addRequestTime(Instant requestTime) {
+    // 정합성을 맞추는 고려를 하지않았다, 고려해야함.
+    public void recordRequestTime(Instant requestTime) {
         log.info("addRequestTime called");
         if (Objects.isNull(requestTime)) {
             throw new IllegalArgumentException("requestTime 이 null 입니다.");
         }
 
-        removeRequestRecordIfOverPeriod();
-
-        downloadTimes.add(requestTime);
+        if (isPossibleDownload()) {
+            downloadTimes.add(requestTime);
+        }
     }
 
     // 주기적으로 지워 줘야하나?
-    private void removeRequestRecordIfOverPeriod() {
+    public void removeRequestRecordIfOverPeriod() {
         log.info("removeRequestRecordIfOverPeriod called");
 
         Instant currentTime = Instant.now();
@@ -127,4 +120,16 @@ public class DownloadInfo {
         log.info("downloadTimes = {}", downloadTimes.size());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DownloadInfo that = (DownloadInfo) o;
+        return hostAddress.equals(that.hostAddress);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hostAddress);
+    }
 }

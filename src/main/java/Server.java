@@ -1,5 +1,4 @@
 import config.ConfigManager;
-import config.server.download.DownloadInfo;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -16,11 +15,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Slf4j
 public class Server {
@@ -53,22 +49,23 @@ public class Server {
     }
 
     private static void recordDownloadTime(String hostAddress) {
-        DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
-        log.info("downloadInfo = {}", downloadInfo);
-
-        downloadInfo.addRequestTime(Instant.now());
-
+////        DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
+//        log.info("downloadInfo = {}", downloadInfo);
+//
+//        downloadInfo.recordRequestTime(Instant.now());
     }
 
     public void start() {
         ThreadTasker threadTasker = new ThreadTasker();
 
-        Supplier<AbstractMessageFactory> mainThreadFactoryCreator = () -> new CompositeMessageFactory(List.of(
-                new WelcomeMessageFactory(),
+        AbstractMessageFactory welcomeMesseageFactory = new WelcomeMessageFactory();
+
+        Function<String, AbstractMessageFactory> mainThreadFactoryCreator = (hostAddress) -> new CompositeMessageFactory(List.of(
+                welcomeMesseageFactory,
                 new DirectoryMessageFactory(),
-                new FilteredMessageFactory(),
+                new FilteredMessageFactory(hostAddress),
                 new ThreadNotExistMessageFactory(threadTasker.createStatusSnapShot()),
-                new ExceedDownloadCountMessageFactory()
+                new ExceedDownloadCountMessageFactory(hostAddress)
         ));
 
         AbstractMessageFactory workerThreadMessageFactory = new CompositeMessageFactory(List.of(
@@ -83,14 +80,13 @@ public class Server {
                 log.info("waiting.. request");
                 socket = serverSocket.accept();
 
+                String hostAddress = socket.getInetAddress().getHostAddress();
                 log.info("accept.. request");
-                log.info("New Client Connect! Connected IP : {}, Port : {}}", socket.getInetAddress().getHostAddress(), socket.getPort());
+                log.info("New Client Connect! Connected IP : {}, Port : {}}", hostAddress, socket.getPort());
 
-                ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.get(), workerThreadMessageFactory);
+                ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.apply(hostAddress), workerThreadMessageFactory);
 
-                if (Objects.nonNull(threadTask)) {
-                    threadTasker.run(threadTask);
-                }
+                threadTasker.run(threadTask);
 
                 socket = UNBOUNDED;
             }
@@ -113,7 +109,7 @@ public class Server {
 
         Function<AbstractMessageFactory, Runnable> runnableCreator = getRunnableCreator(socket, hostAddress, resourcePath);
 
-        if (mainThreadMessageFactory.isSupported(hostAddress, resourcePath)) {
+        if (mainThreadMessageFactory.isSupported(resourcePath)) {
             return new ThreadTask(ThreadTaskType.MAIN, runnableCreator.apply(mainThreadMessageFactory));
         }
 
@@ -123,7 +119,7 @@ public class Server {
     @NotNull
     private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, String hostAddress, ResourcePath resourcePath) {
         return (messageFactory) -> {
-            Message message = messageFactory.createMessage(hostAddress, resourcePath);
+            Message message = messageFactory.createMessage(resourcePath);
 
             if (message instanceof FileMessage) {
                 return () -> {

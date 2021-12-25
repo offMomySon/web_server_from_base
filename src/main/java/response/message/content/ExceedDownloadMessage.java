@@ -1,6 +1,6 @@
 package response.message.content;
 
-import config.server.download.DownloadInfo;
+import download.DownloadInfo;
 import lombok.extern.slf4j.Slf4j;
 import response.message.sender.Message;
 
@@ -23,7 +23,7 @@ public class ExceedDownloadMessage extends Message {
 
         long downloadCountPerPeriod = downloadInfo.getDownloadCountPerPeriod();
         long period = downloadInfo.getPeriod();
-        long leftWaitTimeForDownload = downloadInfo.leftWaitTimeForDownload();
+        long leftWaitTimeForDownload = downloadInfo.getLeftWaitTimeForDownload();
 
         content.append("Exceed download count!!").append("</br>");
         content.append("Period : ").append(period).append("</br>");

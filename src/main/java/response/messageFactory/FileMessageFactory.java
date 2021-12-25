@@ -13,7 +13,7 @@ public class FileMessageFactory implements AbstractMessageFactory {
     private final String FILE_NOT_EXIST_MESSAGE = "Not exist file.";
 
     @Override
-    public Message createMessage(String hostAddress, ResourcePath resourcePath) {
+    public Message createMessage(ResourcePath resourcePath) {
         File downloadFile = resourcePath.createDownloadFile();
 
         if (resourcePath.isFile()) {
@@ -23,7 +23,7 @@ public class FileMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
+    public boolean isSupported(ResourcePath resourcePath) {
         return true;
     }
 }
