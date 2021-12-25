@@ -24,6 +24,6 @@ public class FileMessageFactory implements AbstractMessageFactory {
 
     @Override
     public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
-        return resourcePath.isFile();
+        return true;
     }
 }
