@@ -1,4 +1,4 @@
-package reader;
+package reader.httpspec;
 
 import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
@@ -23,7 +23,6 @@ public class HttpBody {
 
       logger.info("Ready to get http body ");
       while ((bytesRead = reader.read(charBuffer)) > 0) {
-        logger.debug("Loop.. get http body");
 
         bodyStringBuilder.append(charBuffer, 0, bytesRead);
 

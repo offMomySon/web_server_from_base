@@ -2,7 +2,6 @@ package reader;
 
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
-import httpspec.HttpMethod;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,6 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import reader.httpspec.startLine.HttpMethod;
+import reader.httpspec.startLine.HttpStartLine;
 
 class HttpStartLineTest {
 

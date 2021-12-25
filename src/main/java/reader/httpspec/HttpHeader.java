@@ -1,34 +1,26 @@
-package reader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package reader.httpspec;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
-import static util.IoUtil.*;
-
+@Slf4j
 public class HttpHeader {
-
   private final Map<String, String> header = new HashMap<>();
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public HttpHeader(BufferedReader reader) {
     try {
       String headerLine = null;
-      logger.info("Ready to get http header");
+      log.info("Ready to get http header");
       while ((headerLine = reader.readLine()) != null && (headerLine.length() != 0)) {
-        logger.debug("Loop.. get http header");
-        logger.debug(headerLine);
+        log.debug(headerLine);
 
-        String key = headerLine.split(":", 2)[0].trim();
-        String value = headerLine.split(":", 2)[1].trim();
+        String[] headers = headerLine.split(":");
+        String key = headers[0].trim();
+        String value = headers[1].trim();
 
         if (key.length() == 0) {
           throw new IllegalArgumentException("key is empty value.");
@@ -38,7 +30,7 @@ public class HttpHeader {
 
         header.put(key, value);
       }
-      logger.info("Result of http header == \n" + header);
+      log.info("Result of http header == \n" + header);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
