@@ -6,18 +6,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-
 class DownloadInfoTest {
 
     @DisplayName("다운로드 가능하지 않으면 false 를 출력합니다.")
     @Test
     void isPossibleDownload_fail_case() {
         //given
-        DownloadInfo downloadInfo = new DownloadInfo("192.168.0.44");
-        downloadInfo.addRequestTime(Instant.now());
-        downloadInfo.addRequestTime(Instant.now());
-        downloadInfo.addRequestTime(Instant.now());
+        DownloadInfo downloadInfo = DownloadInfo.create("192.168.0.44");
+        downloadInfo.addRequestTime(System.currentTimeMillis());
+        downloadInfo.addRequestTime(System.currentTimeMillis());
+        downloadInfo.addRequestTime(System.currentTimeMillis());
 
         //when
         boolean actual = downloadInfo.isPossibleDownload();
@@ -30,10 +28,10 @@ class DownloadInfoTest {
     @Test
     void isPossibleDownload_success_case() {
         //given
-        DownloadInfo downloadInfo = new DownloadInfo("192.168.0.44");
-        downloadInfo.addRequestTime(Instant.now());
-        downloadInfo.addRequestTime(Instant.now());
-        downloadInfo.addRequestTime(Instant.now());
+        DownloadInfo downloadInfo = DownloadInfo.create("192.168.0.44");
+        downloadInfo.addRequestTime(System.currentTimeMillis());
+        downloadInfo.addRequestTime(System.currentTimeMillis());
+        downloadInfo.addRequestTime(System.currentTimeMillis());
 
         long period = ConfigManager.getInstance().getDownloadConfig().getDownloadRate().getPeriod();
 

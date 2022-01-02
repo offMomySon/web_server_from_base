@@ -1,7 +1,6 @@
 package time;
 
 import config.ConfigManager;
-import config.server.download.DownloadConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -11,21 +10,11 @@ import java.util.TreeSet;
 
 @Slf4j
 public class DownloadInfoAtIp {
-    // 도메인 객체 필요? 하는게 좋다고 하긴하는데. hostAddress 로 리턴값이 string 이니 굳이할 필요 없을것 같다.
     private final String hostAddress;
-    //    private final long seekPeriod;
-//    private final int limitCount;
     private final TreeSet<Instant> downloadTimes = new TreeSet<>();
 
     public DownloadInfoAtIp(String hostAddress) {
-        DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
-
         this.hostAddress = hostAddress;
-
-
-//        seekPeriod = downloadConfig.getPeriod();
-//
-//        limitCount = downloadConfig.getCount();
     }
 
     public boolean isPossibleDownload() {

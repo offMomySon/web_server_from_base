@@ -9,8 +9,12 @@ import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 
 @Slf4j
-public class FilteredMessageFactory implements AbstractMessageFactory {
+public class FilteredMessageFactory extends AbstractHostAddressMessageFactory {
     private final String RESTRICTED_EXTENSION_MESSAGE = "Restricted File extension.";
+
+    public FilteredMessageFactory(String hostAddress) {
+        super(hostAddress);
+    }
 
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {

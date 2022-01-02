@@ -6,12 +6,12 @@ import response.message.sender.Message;
 
 public class DirectoryMessageFactory implements AbstractMessageFactory {
     @Override
-    public Message createMessage(String hostAddress, ResourcePath resourcePath) {
+    public Message createMessage(ResourcePath resourcePath) {
         return new DirectoryMessage(resourcePath.toString());
     }
 
     @Override
-    public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
+    public boolean isSupported(ResourcePath resourcePath) {
         return resourcePath.isDirectory();
     }
 }
