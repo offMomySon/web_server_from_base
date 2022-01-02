@@ -1,16 +1,21 @@
 package response.messageFactory;
 
 import config.server.download.DownloadInfo;
+import config.server.download.DownloadInfoRepository;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import response.message.content.ExceedDownloadMessage;
 import response.message.sender.Message;
 
 @Slf4j
-public class ExceedDownloadCountMessageFactory implements AbstractMessageFactory {
+public class ExceedDownloadCountMessageFactory extends AbstractHostAddressMessageFactory {
+    public ExceedDownloadCountMessageFactory(String hostAddress) {
+        super(hostAddress);
+    }
+
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {
-        DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
+        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
 
         return new ExceedDownloadMessage(downloadInfo);
     }
@@ -18,7 +23,11 @@ public class ExceedDownloadCountMessageFactory implements AbstractMessageFactory
     @Override
     public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
         log.info("called ExceedDownloadCountMessageFactory isSupported");
-        DownloadInfo downloadInfo = DownloadInfo.getDownloadInfoAtHostAddress(hostAddress);
+        if (!DownloadInfoRepository.contains(hostAddress)) {
+            return false;
+        }
+
+        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
 
         log.info("downloadInfoAtHostAddress = {}", downloadInfo);
 

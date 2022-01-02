@@ -8,12 +8,12 @@ import java.util.List;
 public class OrderedMessageResponserFactories {
     private final List<AbstractMessageFactory> factories;
 
-    public OrderedMessageResponserFactories(ThreadStatusSnapShot statusSnapShot) {
+    public OrderedMessageResponserFactories(ThreadStatusSnapShot statusSnapShot, String hostAddress) {
         this.factories = List.of(
                 new ThreadNotExistMessageFactory(statusSnapShot),
                 new WelcomeMessageFactory(),
                 new DirectoryMessageFactory(),
-                new FilteredMessageFactory(),
+                new FilteredMessageFactory(hostAddress),
                 new FileMessageFactory());
     }
 

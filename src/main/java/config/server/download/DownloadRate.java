@@ -16,4 +16,8 @@ public class DownloadRate {
         this.count = count;
         this.period = period;
     }
+
+    public boolean isExceedDownloadCount(int downloadSize) {
+        return count <= downloadSize;
+    }
 }
