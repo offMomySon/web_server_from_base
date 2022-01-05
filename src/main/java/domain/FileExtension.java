@@ -34,6 +34,13 @@ public enum FileExtension {
                 .orElse(UNKNOWN);
     }
 
+    public static FileExtension from(ResourcePath resourcePath) {
+        if (!resourcePath.isFile()) {
+            throw new IllegalStateException("상태 상이.");
+        }
+        return parse(resourcePath.get().toString());
+    }
+
     private static String validate(String extension) {
         if (Objects.isNull(extension)) {
             throw new IllegalArgumentException("argument 가 null 이면 안됩니다.");

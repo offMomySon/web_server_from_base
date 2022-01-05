@@ -16,6 +16,7 @@ class DownloadConfigTest {
     void create() {
         //given
         //when
+        DownloadConfig downloadConfig1 = DownloadConfig.create();
         Throwable actual = Assertions.catchThrowable(() -> {
             DownloadConfig downloadConfig = DownloadConfig.create();
         });

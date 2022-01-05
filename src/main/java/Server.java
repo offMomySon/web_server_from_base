@@ -18,7 +18,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Slf4j
@@ -86,11 +85,10 @@ public class Server {
                 log.info("accept.. request");
                 log.info("New Client Connect! Connected IP : {}, Port : {}}", hostAddress, socket.getPort());
 
+
                 ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.apply(hostAddress), workerThreadMessageFactory);
 
-                if (Objects.nonNull(threadTask)) {
-                    threadTasker.run(threadTask);
-                }
+                threadTasker.run(threadTask);
 
                 socket = UNBOUNDED;
             }

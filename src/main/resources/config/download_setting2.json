@@ -1,0 +1,46 @@
+{
+  "downloadPath": "/Users/jihunoh/IdeaProjects/web_server_from_base/src/main/resources/files",
+  "downloadRate": {
+    "period": 10000,
+    "count": 2
+  },
+  "restrictedFileExtension": [
+    ".jpg",
+    ".class"
+  ],
+  "downloadInfoAtIps": [
+    {
+      "ip": "192.168.0.1",
+      "downloadRate": {
+        "period": 10000,
+        "count": 2
+      },
+      "restrictedFileExtension": [
+        ".jpg"
+      ]
+    },
+    {
+      "ip": "192.168.0.2",
+      "downloadRate": {
+        "period": 1000,
+        "count": 2
+      },
+      "restrictedFileExtension": [
+        ".class"
+      ]
+    },
+    {
+      "ip": "192.168.0.3",
+      "downloadRate": {
+        "period": 1000,
+        "count": 2
+      }
+    },
+    {
+      "ip": "192.168.0.4",
+      "restrictedFileExtension": [
+        ".class"
+      ]
+    }
+  ]
+}
