@@ -1,48 +1,44 @@
 package time;
 
 import config.ConfigManager;
-import config.server.download.DownloadInfo;
+import config.server.download.DownloadInfoRestrictChecker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class DownloadInfoTest {
 
     @DisplayName("다운로드 가능하지 않으면 false 를 출력합니다.")
-    @Test
-    void isPossibleDownload_fail_case() {
+    @ParameterizedTest
+    @ValueSource(strings = {"192.168.0.44"})
+    void isPossibleDownload_fail_case(String ip) {
         //given
-        DownloadInfo downloadInfo = DownloadInfo.create("192.168.0.44");
-        downloadInfo.addRequestTime(System.currentTimeMillis());
-        downloadInfo.addRequestTime(System.currentTimeMillis());
-        downloadInfo.addRequestTime(System.currentTimeMillis());
+        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
+
+        for (int i = 0; i < 10; i++) {
+            if (!downloadInfoRestrictChecker.isRestrictedRate(ip)) {
+                downloadInfoRestrictChecker.increaseCount(ip);
+            }
+        }
 
         //when
-        boolean actual = downloadInfo.isPossibleDownload();
+        boolean actual = downloadInfoRestrictChecker.isRestrictedRate(ip);
 
         //then
         Assertions.assertThat(actual).isFalse();
     }
 
     @DisplayName("다운로드 가능하면 true 를 출력합니다.")
-    @Test
-    void isPossibleDownload_success_case() {
+    @ParameterizedTest
+    @ValueSource(strings = {"192.168.0.44"})
+    void isPossibleDownload_success_case(String ip) {
         //given
-        DownloadInfo downloadInfo = DownloadInfo.create("192.168.0.44");
-        downloadInfo.addRequestTime(System.currentTimeMillis());
-        downloadInfo.addRequestTime(System.currentTimeMillis());
-        downloadInfo.addRequestTime(System.currentTimeMillis());
-
-        long period = ConfigManager.getInstance().getDownloadConfig().getDownloadRate().getPeriod();
-
-        try {
-            Thread.sleep(period + 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
 
         //when
-        boolean actual = downloadInfo.isPossibleDownload();
+        boolean actual = downloadInfoRestrictChecker.isRestrictedRate(ip);
 
         //then
         Assertions.assertThat(actual).isTrue();

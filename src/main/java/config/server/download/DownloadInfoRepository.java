@@ -1,52 +1,48 @@
 package config.server.download;
 
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import config.server.download.data.DownloadInfoAtIp;
+import config.server.download.data.DownloadRate;
+import domain.FileExtension;
+import lombok.Getter;
+import lombok.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-@Slf4j
+// Todo 1
+// find 만을 위한 1급 컬렉션,
+// 1. DownloadConfig 로 부터 find 만을 위한 객체를 생성 이란 생각을 하기 어렵다.
+//
+// 2. class 기능이 너무 적은거 같다. find.
+//    config 에 모든 기능을 이동시키면 안되나?
+//
+// 3. Map 으로 꼭 주소와 객체를 매핑해야할까?.. Set 으로도 충분히 찾을수 있는데?
+@Getter
 public class DownloadInfoRepository {
-    private static final DownloadInfoRepository INSTANCE = new DownloadInfoRepository();
+    private final Map<String, DownloadInfoAtIp> values;
+    private final DownloadInfoAtIp commonIp;
 
-    private static final Map<String, DownloadInfo> downloadInfos = new HashMap<>();
-
-    private DownloadInfoRepository() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleWithFixedDelay(
-                () -> downloadInfos.values().stream().forEach(DownloadInfo::removeRequestRecordIfOverPeriod),
-                0, 0, TimeUnit.MILLISECONDS);
+    private DownloadInfoRepository(@NonNull Map<String, DownloadInfoAtIp> values,
+                                   @NonNull DownloadInfoAtIp commonIp) {
+        this.values = values;
+        this.commonIp = commonIp;
     }
 
-    public static boolean contains(String hostAddress) {
-        if (Objects.isNull(hostAddress)) {
-            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
-        }
+    public static DownloadInfoRepository create(DownloadRate downloadRate,
+                                                Set<FileExtension> restrictedFileExtension,
+                                                Set<DownloadInfoAtIp> downloadInfoAtIps) {
 
-        return downloadInfos.containsKey(hostAddress);
+        Map<String, DownloadInfoAtIp> newValues = downloadInfoAtIps.stream()
+                .collect(Collectors.toMap(DownloadInfoAtIp::getHostAddress, Function.identity(), (it1, it2) -> it1));
+
+        return new DownloadInfoRepository(newValues, DownloadInfoAtIp.allMatched(downloadRate, restrictedFileExtension));
     }
 
-    public static DownloadInfo addDownloadInfo(String hostAddress) {
-        if (Objects.isNull(hostAddress)) {
-            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
-        }
-
-        return downloadInfos.put(hostAddress, DownloadInfo.create(hostAddress));
-    }
-
-    public static DownloadInfo getDownloadInfo(String hostAddress) {
-        if (Objects.isNull(hostAddress)) {
-            throw new IllegalArgumentException("hostAddress 가 null 입니다.");
-        }
-
-        return downloadInfos.get(hostAddress);
-    }
-
-    public DownloadInfoRepository getInstance() {
-        return INSTANCE;
+    public DownloadInfoAtIp find(@NonNull String ip) {
+        return values.getOrDefault(ip, commonIp);
     }
 }

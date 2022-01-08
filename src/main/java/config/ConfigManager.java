@@ -1,7 +1,7 @@
 package config;
 
 import config.server.BasicConfig;
-import config.server.download.DownloadConfig;
+import config.server.download.data.DownloadConfig;
 import config.server.thread.ThreadConfig;
 import domain.ResourcePath;
 import lombok.AccessLevel;

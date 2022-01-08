@@ -1,6 +1,6 @@
 import config.ConfigManager;
-import config.server.download.DownloadInfo;
 import config.server.download.DownloadInfoRepository;
+import config.server.download.DownloadInfoRestrictChecker;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +52,14 @@ public class Server {
     }
 
     private static void recordDownloadTime(String hostAddress) {
-        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
-        log.info("downloadInfo = {}", downloadInfo);
+        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
 
-        downloadInfo.addRequestTime(System.currentTimeMillis());
+        downloadInfoRestrictChecker.increaseCount(hostAddress);
 
+//        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
+//        log.info("downloadInfo = {}", downloadInfo);
+//
+//        downloadInfo.addRequestTime(System.currentTimeMillis());
     }
 
     public void start() {
@@ -88,9 +91,7 @@ public class Server {
 
                 ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.apply(hostAddress), workerThreadMessageFactory);
 
-                if (Objects.nonNull(threadTask)) {
-                    threadTasker.run(threadTask);
-                }
+                threadTasker.run(threadTask);
 
                 socket = UNBOUNDED;
             }

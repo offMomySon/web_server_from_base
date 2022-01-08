@@ -2,7 +2,7 @@ package response.message.content;
 
 import config.ConfigManager;
 import config.server.BasicConfig;
-import config.server.download.DownloadConfig;
+import config.server.download.data.DownloadConfig;
 import config.server.thread.ThreadConfig;
 import lombok.extern.slf4j.Slf4j;
 import response.message.sender.Message;
@@ -33,9 +33,11 @@ public class WelcomePageMessage extends Message {
         content.append("usable thread count : ").append(threadConfig.getUsableThreadCount()).append("</br>");
         content.append("waitable thread count : ").append(threadConfig.getWaitableThreadCount()).append("</br>");
         content.append("download path : ").append(downloadConfig.getRootPath()).append("</br>");
-        content.append("download count : ").append(downloadConfig.getDownloadRate().getCount()).append("</br>");
-        content.append("download period : ").append(downloadConfig.getDownloadRate().getPeriod()).append("</br>");
-        content.append("restricted file extension : ").append(downloadConfig.getRestrictedFileExtension().toString()).append("</br>");
+        // ToDo 4
+        // getCount, period, fileExtension 가져오는게 이상해지는데..
+        content.append("download count : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getDownloadRate().getCount()).append("</br>");
+        content.append("download period : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getDownloadRate().getPeriod().getSeconds()).append("</br>");
+        content.append("restricted file extension : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getRestrictedFileExtensions().toString()).append("</br>");
 
         return content.toString();
     }
