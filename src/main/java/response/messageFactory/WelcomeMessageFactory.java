@@ -2,6 +2,7 @@ package response.messageFactory;
 
 import config.ConfigManager;
 import domain.ResourcePath;
+import lombok.NonNull;
 import response.message.content.WelcomePageMessage;
 import response.message.sender.Message;
 

@@ -21,11 +21,7 @@ public class ThreadTasker {
     // TODO
     // waitIfNotExistLeftThread() ->  runWithOccupiedWorkerThread() 순서 보장을 위해 beforeWait 를 선언함.
     // 너무 데이터 적인 측면인가?
-    private Boolean beforeWaited;
-
-    public ThreadTasker() {
-        beforeWaited = false;
-    }
+    private boolean beforeWaited = false;
 
     public void run(ThreadTask threadTask) {
         if (threadTask.isMainThread()) {

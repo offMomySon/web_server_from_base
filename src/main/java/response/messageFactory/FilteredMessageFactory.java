@@ -5,6 +5,7 @@ import config.server.download.DownloadInfoRestrictChecker;
 import config.server.download.data.DownloadConfig;
 import domain.FileExtension;
 import domain.ResourcePath;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import response.message.content.SimpleMessage;
 import response.message.sender.Message;
@@ -13,7 +14,7 @@ import response.message.sender.Message;
 public class FilteredMessageFactory extends AbstractHostAddressMessageFactory {
     private final String RESTRICTED_EXTENSION_MESSAGE = "Restricted File extension.";
 
-    public FilteredMessageFactory(String hostAddress) {
+    public FilteredMessageFactory(@NonNull String hostAddress) {
         super(hostAddress);
     }
 

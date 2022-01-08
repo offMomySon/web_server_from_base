@@ -5,13 +5,14 @@ import config.server.download.DownloadInfoRepository;
 import config.server.download.DownloadInfoRestrictChecker;
 import config.server.download.data.DownloadInfoAtIp;
 import domain.ResourcePath;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import response.message.content.ExceedDownloadMessage;
 import response.message.sender.Message;
 
 @Slf4j
 public class ExceedDownloadCountMessageFactory extends AbstractHostAddressMessageFactory {
-    public ExceedDownloadCountMessageFactory(String hostAddress) {
+    public ExceedDownloadCountMessageFactory(@NonNull String hostAddress) {
         super(hostAddress);
     }
 

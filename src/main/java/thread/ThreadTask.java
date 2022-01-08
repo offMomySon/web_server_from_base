@@ -1,13 +1,14 @@
 package thread;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class ThreadTask {
     private ThreadTaskType type;
     private Runnable runnable;
 
-    public ThreadTask(ThreadTaskType type, Runnable runnable) {
+    public ThreadTask(@NonNull ThreadTaskType type, @NonNull Runnable runnable) {
         this.type = type;
         this.runnable = runnable;
     }

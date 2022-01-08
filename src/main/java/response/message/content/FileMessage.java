@@ -1,6 +1,7 @@
 package response.message.content;
 
 import domain.FileExtension;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import response.message.sender.Message;
 
@@ -14,7 +15,7 @@ public class FileMessage extends Message {
 
     private final char[] buffer = new char[4096];
 
-    public FileMessage(FileExtension fileExtensionType, File downloadFile) {
+    public FileMessage(@NonNull FileExtension fileExtensionType, @NonNull File downloadFile) {
         this.downloadFile = downloadFile;
         this.fileExtensionType = fileExtensionType;
     }
