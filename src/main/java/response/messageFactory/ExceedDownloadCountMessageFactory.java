@@ -1,7 +1,9 @@
 package response.messageFactory;
 
-import config.server.download.DownloadInfo;
+import config.ConfigManager;
 import config.server.download.DownloadInfoRepository;
+import config.server.download.DownloadInfoRestrictChecker;
+import config.server.download.data.DownloadInfoAtIp;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import response.message.content.ExceedDownloadMessage;
@@ -15,22 +17,22 @@ public class ExceedDownloadCountMessageFactory extends AbstractHostAddressMessag
 
     @Override
     public Message createMessage(String hostAddress, ResourcePath resourcePath) {
-        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
+        DownloadInfoRepository downloadInfoRepository = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRepository();
+        DownloadInfoAtIp downloadInfoAtIp = downloadInfoRepository.find(hostAddress);
 
-        return new ExceedDownloadMessage(downloadInfo);
+        return new ExceedDownloadMessage(downloadInfoAtIp);
     }
 
     @Override
     public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
         log.info("called ExceedDownloadCountMessageFactory isSupported");
-        if (!DownloadInfoRepository.contains(hostAddress)) {
-            return false;
+
+        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
+
+        if (downloadInfoRestrictChecker.isRestrictedRate(hostAddress)) {
+            return true;
         }
 
-        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
-
-        log.info("downloadInfoAtHostAddress = {}", downloadInfo);
-
-        return !downloadInfo.isPossibleDownload();
+        return false;
     }
 }

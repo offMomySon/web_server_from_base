@@ -1,7 +1,8 @@
 package response.messageFactory;
 
 import config.ConfigManager;
-import config.server.download.DownloadConfig;
+import config.server.download.DownloadInfoRestrictChecker;
+import config.server.download.data.DownloadConfig;
 import domain.FileExtension;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
@@ -23,18 +24,11 @@ public class FilteredMessageFactory extends AbstractHostAddressMessageFactory {
 
     @Override
     public boolean isSupported(String hostAddress, ResourcePath resourcePath) {
-        DownloadConfig downloadConfig = ConfigManager.getInstance().getDownloadConfig();
+        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
         FileExtension fileExtension = resourcePath.createFileExtension();
 
-        if (downloadConfig.containsHostAddressAtRestrictedFileExtension(hostAddress)) {
-            if (downloadConfig.containsRestrictedFileExtensionAtHostAddress(hostAddress, fileExtension)) {
-                return true;
-            }
-            return false;
-        } else {
-            if (downloadConfig.containsRestrictedFileExtension(fileExtension)) {
-                return true;
-            }
+        if (downloadInfoRestrictChecker.isRestrictedFileExtension(hostAddress, fileExtension)) {
+            return true;
         }
         return false;
     }
