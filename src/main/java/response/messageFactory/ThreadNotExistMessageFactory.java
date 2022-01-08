@@ -1,6 +1,7 @@
 package response.messageFactory;
 
 import domain.ResourcePath;
+import lombok.NonNull;
 import response.message.content.SimpleMessage;
 import response.message.sender.Message;
 import thread.snapshot.ThreadStatusSnapShot;
@@ -8,9 +9,9 @@ import thread.snapshot.ThreadStatusSnapShot;
 public class ThreadNotExistMessageFactory implements AbstractMessageFactory {
     private final static String NOT_AVAILABLE_THREAD = "not available thread.";
 
-    private ThreadStatusSnapShot statusSnapShot;
+    private final ThreadStatusSnapShot statusSnapShot;
 
-    public ThreadNotExistMessageFactory(ThreadStatusSnapShot statusSnapShot) {
+    public ThreadNotExistMessageFactory(@NonNull ThreadStatusSnapShot statusSnapShot) {
         this.statusSnapShot = statusSnapShot;
     }
 

@@ -4,6 +4,7 @@ import config.ConfigManager;
 import config.server.BasicConfig;
 import config.server.download.data.DownloadConfig;
 import config.server.thread.ThreadConfig;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import response.message.sender.Message;
 
@@ -11,7 +12,7 @@ import response.message.sender.Message;
 public class WelcomePageMessage extends Message {
     private final ConfigManager configManager;
 
-    public WelcomePageMessage(ConfigManager configManager) {
+    public WelcomePageMessage(@NonNull ConfigManager configManager) {
         this.configManager = configManager;
     }
 

@@ -13,15 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder(access = AccessLevel.PRIVATE)
 public class ConfigManager {
-    private final BasicConfig basicConfig;    private static ConfigManager configManager = getInstance();
+    private static ConfigManager INSTANCE = ConfigManager.create();
+
+    private final BasicConfig basicConfig;
     private final ThreadConfig threadConfig;
     private final DownloadConfig downloadConfig;
 
     public static ConfigManager getInstance() {
-        if (configManager != null) {
-            return configManager;
-        }
-        return configManager = ConfigManager.create();
+        return INSTANCE;
     }
 
     private static ConfigManager create() {
@@ -35,7 +34,5 @@ public class ConfigManager {
     public boolean isWelcomePage(ResourcePath resourcePath) {
         return basicConfig.isWelcomePage(resourcePath);
     }
-
-
 }
 

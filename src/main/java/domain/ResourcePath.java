@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import config.ConfigManager;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,46 +23,36 @@ import java.util.stream.Collectors;
 public class ResourcePath {
     private final Path value;
 
+    private ResourcePath(@NonNull Path value) {
+        this.value = removeRelativePath(value);
+    }
+
     @JsonCreator
-    private ResourcePath(Path value) {
-        this.value = value;
-    }
-
     public static ResourcePath create(String value) {
-        if (Objects.isNull(value)) {
-            throw new IllegalArgumentException("argument 가 null 이면 안됩니다.");
-        }
-
-        Path path;
-        try {
-            path = Paths.get(removeRelativePath(Paths.get(value).toString()));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("상대경로를 벗어나, download config 값을 침범하는 path 를 받으면 안됩니다.");
-        }
-
-        return new ResourcePath(path);
+        return new ResourcePath(Paths.get(value));
     }
 
-    private static String removeRelativePath(String requestTarget) throws Exception {
+    private static Path removeRelativePath(Path requestTarget) {
         Stack<String> pathStack = new Stack<>();
-        String[] splitPath = requestTarget.split("/");
+        String[] splitPath = requestTarget.toString().split("/");
 
         for (String path : splitPath) {
             if (path.length() == 0) {
                 continue;
             }
 
-            if (path.equals("..")) {
-                if (pathStack.isEmpty()) {
-                    throw new Exception("상대경로를 벗어나면 안됩니다.");
-                }
-                pathStack.pop();
-            } else {
+            if (!path.equals("..")) {
                 pathStack.push(path);
+                continue;
             }
+
+            if (pathStack.isEmpty()) {
+                throw new RuntimeException("상대경로를 벗어나면 안됩니다.");
+            }
+            pathStack.pop();
         }
 
-        return pathStack.stream().collect(Collectors.joining("/", "/", ""));
+        return Paths.get("/" + String.join("/", pathStack));
     }
 
     public ResourcePath append(ResourcePath resourcePath) {

@@ -18,7 +18,14 @@ public class ThreadWorker {
     private AtomicInteger currentValue = new AtomicInteger();
 
     public ThreadWorker(int usableThread) {
-        this.maxValue = usableThread;
+        this.maxValue = validatePositive(usableThread);
+    }
+
+    private int validatePositive(int usableThread) {
+        if (usableThread < 0) {
+            throw new IllegalArgumentException("maxValue 는 0 미만일 수 없습니다.");
+        }
+        return usableThread;
     }
 
     public boolean isLeft() {

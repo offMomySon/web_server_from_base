@@ -1,6 +1,7 @@
 package response.message.content;
 
 import config.server.download.data.DownloadInfoAtIp;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import response.message.sender.Message;
 
@@ -8,7 +9,7 @@ import response.message.sender.Message;
 public class ExceedDownloadMessage extends Message {
     private final DownloadInfoAtIp downloadInfoAtIp;
 
-    public ExceedDownloadMessage(DownloadInfoAtIp downloadInfoAtIp) {
+    public ExceedDownloadMessage(@NonNull DownloadInfoAtIp downloadInfoAtIp) {
         this.downloadInfoAtIp = downloadInfoAtIp;
     }
 

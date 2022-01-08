@@ -1,6 +1,7 @@
 package domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.NonNull;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -23,7 +24,7 @@ public enum FileExtension {
     }
 
     @JsonCreator
-    public static FileExtension parse(String extension) {
+    public static FileExtension parse(@NonNull String extension) {
         String _extension = validate(extension);
 
         FileExtension[] fileExtensionTypes = values();
