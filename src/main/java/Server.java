@@ -1,3 +1,7 @@
+import Sequence.CompositedTaskRunner;
+import Sequence.MainTaskRunner;
+import Sequence.PreTaskRunner;
+import Sequence.TaskRunner;
 import config.ConfigManager;
 import config.server.download.DownloadInfoRestrictChecker;
 import domain.ResourcePath;
@@ -59,19 +63,22 @@ public class Server {
         return hostAddress;
     }
 
-    private static ThreadTask buildThreadTask(ThreadTaskType type,
-                                              Function<PreTask, Runnable> preTaskCreator,
-                                              PreTask preTask,
-                                              Function<AbstractMessageFactory, Runnable> runnableCreator,
-                                              AbstractMessageFactory threadMessageFactory) throws IOException {
-        return ThreadTask
-                .empty(type)
-                .andThen(preTaskCreator.apply(preTask))
-                .andThen(runnableCreator.apply(threadMessageFactory));
+    @NotNull
+    private static Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, ResourcePath resourcePath) {
+        return (messageFactory) -> {
+            Message message = messageFactory.createMessage(resourcePath);
+
+            return () -> sendMessage(socket, message);
+        };
     }
 
     public void start() {
         //TODO 어셈블러 장점 이해하기
+        // 비지니스 로직에 필요한 객체들을 미리 생성해서, 비지니스로직에만 집중할 수 있게 된다.
+        // 객체들이 캐싱되기 때문에 서버의 메모리 사용량을 줄일 수 있다.
+
+        Socket socket = UNBOUNDED;
+
         ThreadTasker threadTasker = new ThreadTasker();
 
         Function<String, AbstractMessageFactory> mainThreadFactoryCreator = (hostAddress) -> new CompositeMessageFactory(List.of(
@@ -91,29 +98,31 @@ public class Server {
                 RestrictPreTask.create(hostAddress, resourcePath.createFileExtension())
         ));
         //TODO 어셈블러 장점 이해하기 END
-        Socket socket = UNBOUNDED;
+
+        BiFunction<Socket, ResourcePath, TaskRunner> taskRunnerCreator = (_socket, resourcePath) -> new CompositedTaskRunner(List.of(
+                new PreTaskRunner(preTaskCreator.apply(_socket.getInetAddress().getHostAddress(), resourcePath)),
+                new MainTaskRunner(threadTasker,
+                        mainThreadFactoryCreator.apply(getHostAddress(_socket)),
+                        workerThreadMessageFactory,
+                        getRunnableCreator(_socket, resourcePath)
+                )
+        ));
 
         try {
             while (true) {
                 socket = getSocket();
 
-                String hostAddress = getHostAddress(socket);
-
                 // TODO 구조 이해하기 (노션에다가 정리해서 설명) HINT. PRE MESSAGE TASK -> MAin MESSAGE TASK -> VIEW RENDERING (예시)
                 // TODO 구조를 이해했으면, 그 구조가 코드로 표현할 수 있게 다듬기 (위 구조를 잡았으면 위 구조대로 해석할 수 있게 코드로 표현하기
                 // TODO 아래코드는 구조는 잡혔으나 시스템 표현이 안좋다. 그렇기에 뭉탱이로 처리할것들을 처리하여 위 구조가 '잘' 드러나도록 코드를 리팩토링하기
                 // TODO 이 과정에서 특정 class 파일이 나올것이다. 해당 파일의 역할을 생각하여 구조를 다듬어 보자.
+
+                // 1. pre message task.
+                // 2. main message task.
                 ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
 
-                Function<PreTask, Runnable> messagePreTaskCreator = createMessagePreTaskCreator(resourcePath);
-                Function<AbstractMessageFactory, Runnable> messageHandlerCreator = getRunnableCreator(socket, resourcePath);
-
-                PreTask preTask = preTaskCreator.apply(hostAddress, resourcePath);
-                AbstractMessageFactory mainFactory = mainThreadFactoryCreator.apply(hostAddress);
-                ThreadTaskType taskType = mainFactory.isSupported(resourcePath) ? ThreadTaskType.MAIN : ThreadTaskType.THREAD;
-                AbstractMessageFactory targetFactory = taskType.isMain() ? mainFactory : workerThreadMessageFactory;
-
-                threadTasker.run(buildThreadTask(taskType, messagePreTaskCreator, preTask, messageHandlerCreator, targetFactory));
+                TaskRunner taskRunner = taskRunnerCreator.apply(socket, resourcePath);
+                taskRunner.doRun(resourcePath);
 
                 socket = UNBOUNDED;
             }
@@ -136,22 +145,5 @@ public class Server {
         log.info("accept.. request");
 
         return socket;
-    }
-
-    @NotNull
-    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, ResourcePath resourcePath) {
-        return (messageFactory) -> {
-            Message message = messageFactory.createMessage(resourcePath);
-
-            return () -> sendMessage(socket, message);
-        };
-    }
-
-    private Function<PreTask, Runnable> createMessagePreTaskCreator(ResourcePath resourcePath) {
-        return preTask -> () -> {
-            if (preTask.isWorkablePreTaskRequest(resourcePath)) {
-                preTask.doWork(resourcePath);
-            }
-        };
     }
 }
