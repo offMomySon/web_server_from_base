@@ -13,6 +13,18 @@ public class ThreadTask {
         this.runnable = runnable;
     }
 
+    public static ThreadTask empty(ThreadTaskType type) {
+        return new ThreadTask(type, () -> {
+        });
+    }
+
+    public ThreadTask andThen(Runnable task) {
+        return new ThreadTask(type, () -> {
+            this.run();
+            task.run();
+        });
+    }
+
     public boolean isMainThread() {
         return ThreadTaskType.MAIN == type;
     }

@@ -11,14 +11,16 @@ import java.io.IOException;
 
 @Slf4j
 public class HttpBody {
-
-    private final StringBuilder bodyStringBuilder = new StringBuilder();
     private final String body;
-    private final char[] charBuffer = new char[8192];
 
-    // todo
-    // 이런 애들은 생성자 만들기 어려운데..?
-    public HttpBody(BufferedReader reader, int contentLength) {
+    public HttpBody(String body) {
+        this.body = body;
+    }
+
+    public static HttpBody create(BufferedReader reader, int contentLength) {
+        char[] charBuffer = new char[8192];
+        StringBuilder bodyStringBuilder = new StringBuilder();
+
         try {
             int curContentLength = 0;
             int bytesRead = -1;
@@ -36,14 +38,15 @@ public class HttpBody {
                 }
             }
 
-            body = bodyStringBuilder.toString();
-            log.info("End http body read \n == Result body == \n" + body);
+            log.info("End http body read \n == Result body == \n" + bodyStringBuilder.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return new HttpBody(bodyStringBuilder.toString());
     }
 
     public String getBody() {
-        return bodyStringBuilder.toString();
+        return body;
     }
 }

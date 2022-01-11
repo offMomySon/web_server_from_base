@@ -22,8 +22,6 @@ public class ExceedDownloadMessage extends Message {
     protected String getContent() {
         log.info("Start to make ExceedDownloadMessage");
 
-        //Todo 5
-        // checker 에 있는 DownloadInfoRestrict 에 left 시간을 기록하지 않고 있음.
 //        long downloadCountPerPeriod = downloadInfoAtIp.getDownloadCountPerPeriod();
         long period = downloadInfoAtIp.getDownloadRate().getPeriod().getSeconds();
 //        long leftWaitTimeForDownload = downloadInfo.leftWaitTimeForDownload();

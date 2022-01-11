@@ -34,8 +34,6 @@ public class WelcomePageMessage extends Message {
         content.append("usable thread count : ").append(threadConfig.getUsableThreadCount()).append("</br>");
         content.append("waitable thread count : ").append(threadConfig.getWaitableThreadCount()).append("</br>");
         content.append("download path : ").append(downloadConfig.getRootPath()).append("</br>");
-        // ToDo 4
-        // getCount, period, fileExtension 가져오는게 이상해지는데..
         content.append("download count : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getDownloadRate().getCount()).append("</br>");
         content.append("download period : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getDownloadRate().getPeriod().getSeconds()).append("</br>");
         content.append("restricted file extension : ").append(downloadConfig.getDownloadInfoRepository().getCommonIp().getRestrictedFileExtensions().toString()).append("</br>");

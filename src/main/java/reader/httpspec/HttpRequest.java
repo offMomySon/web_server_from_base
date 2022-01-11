@@ -23,14 +23,12 @@ public class HttpRequest {
     private final BufferedReader reader;
 
     public HttpRequest(InputStream inputStream) {
-        // Todo
-        // http read 할떄 BufferedReader 을 httpStartLine,httpHeader, httpBody 에서 따로 만들면 읽지못해서 여기서 BufferedReader 를 생성함.
         reader = createReader(inputStream);
 
         httpStartLine = new HttpStartLine(reader);
         httpHeader = new HttpHeader(reader);
         if (httpHeader.containKey(READ_CONTENT_LENGTH)) {
-            httpBody = new HttpBody(reader, parseInt(httpHeader.getValue(READ_CONTENT_LENGTH)));
+            httpBody = HttpBody.create(reader, parseInt(httpHeader.getValue(READ_CONTENT_LENGTH)));
         } else {
             httpBody = HTTP_BODY_NOT_EXIST;
         }

@@ -30,7 +30,7 @@ public class ExceedDownloadCountMessageFactory extends AbstractHostAddressMessag
 
         DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
 
-        if (downloadInfoRestrictChecker.isRestrictedRate(hostAddress)) {
+        if (downloadInfoRestrictChecker.isRestrictedCount(hostAddress)) {
             return true;
         }
 

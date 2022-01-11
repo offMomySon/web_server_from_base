@@ -1,13 +1,14 @@
 import config.ConfigManager;
-import config.server.download.DownloadInfoRepository;
 import config.server.download.DownloadInfoRestrictChecker;
 import domain.ResourcePath;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import reader.httpspec.HttpRequest;
-import response.message.content.FileMessage;
 import response.message.sender.Message;
 import response.messageFactory.*;
+import response.pretask.CompositedPreTask;
+import response.pretask.PreTask;
+import response.pretask.RestrictPreTask;
 import thread.ThreadTask;
 import thread.ThreadTaskType;
 import thread.ThreadTasker;
@@ -18,7 +19,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Slf4j
@@ -51,18 +52,26 @@ public class Server {
         }
     }
 
-    private static void recordDownloadTime(String hostAddress) {
-        DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
+    private static String getHostAddress(Socket socket) {
+        String hostAddress = socket.getInetAddress().getHostAddress();
+        log.info("New Client Connect! Connected IP : {}, Port : {}}", hostAddress, socket.getPort());
 
-        downloadInfoRestrictChecker.increaseCount(hostAddress);
+        return hostAddress;
+    }
 
-//        DownloadInfo downloadInfo = DownloadInfoRepository.getDownloadInfo(hostAddress);
-//        log.info("downloadInfo = {}", downloadInfo);
-//
-//        downloadInfo.addRequestTime(System.currentTimeMillis());
+    private static ThreadTask buildThreadTask(ThreadTaskType type,
+                                              Function<PreTask, Runnable> preTaskCreator,
+                                              PreTask preTask,
+                                              Function<AbstractMessageFactory, Runnable> runnableCreator,
+                                              AbstractMessageFactory threadMessageFactory) throws IOException {
+        return ThreadTask
+                .empty(type)
+                .andThen(preTaskCreator.apply(preTask))
+                .andThen(runnableCreator.apply(threadMessageFactory));
     }
 
     public void start() {
+        //TODO 어셈블러 장점 이해하기
         ThreadTasker threadTasker = new ThreadTasker();
 
         Function<String, AbstractMessageFactory> mainThreadFactoryCreator = (hostAddress) -> new CompositeMessageFactory(List.of(
@@ -78,20 +87,33 @@ public class Server {
                 new FileMessageFactory()
         ));
 
+        BiFunction<String, ResourcePath, PreTask> preTaskCreator = (hostAddress, resourcePath) -> new CompositedPreTask(List.of(
+                RestrictPreTask.create(hostAddress, resourcePath.createFileExtension())
+        ));
+        //TODO 어셈블러 장점 이해하기 END
         Socket socket = UNBOUNDED;
 
         try {
             while (true) {
-                log.info("waiting.. request");
-                socket = serverSocket.accept();
+                socket = getSocket();
 
-                String hostAddress = socket.getInetAddress().getHostAddress();
-                log.info("accept.. request");
-                log.info("New Client Connect! Connected IP : {}, Port : {}}", hostAddress, socket.getPort());
+                String hostAddress = getHostAddress(socket);
 
-                ThreadTask threadTask = createThreadTask(socket, mainThreadFactoryCreator.apply(hostAddress), workerThreadMessageFactory);
+                // TODO 구조 이해하기 (노션에다가 정리해서 설명) HINT. PRE MESSAGE TASK -> MAin MESSAGE TASK -> VIEW RENDERING (예시)
+                // TODO 구조를 이해했으면, 그 구조가 코드로 표현할 수 있게 다듬기 (위 구조를 잡았으면 위 구조대로 해석할 수 있게 코드로 표현하기
+                // TODO 아래코드는 구조는 잡혔으나 시스템 표현이 안좋다. 그렇기에 뭉탱이로 처리할것들을 처리하여 위 구조가 '잘' 드러나도록 코드를 리팩토링하기
+                // TODO 이 과정에서 특정 class 파일이 나올것이다. 해당 파일의 역할을 생각하여 구조를 다듬어 보자.
+                ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
 
-                threadTasker.run(threadTask);
+                Function<PreTask, Runnable> messagePreTaskCreator = createMessagePreTaskCreator(resourcePath);
+                Function<AbstractMessageFactory, Runnable> messageHandlerCreator = getRunnableCreator(socket, resourcePath);
+
+                PreTask preTask = preTaskCreator.apply(hostAddress, resourcePath);
+                AbstractMessageFactory mainFactory = mainThreadFactoryCreator.apply(hostAddress);
+                ThreadTaskType taskType = mainFactory.isSupported(resourcePath) ? ThreadTaskType.MAIN : ThreadTaskType.THREAD;
+                AbstractMessageFactory targetFactory = taskType.isMain() ? mainFactory : workerThreadMessageFactory;
+
+                threadTasker.run(buildThreadTask(taskType, messagePreTaskCreator, preTask, messageHandlerCreator, targetFactory));
 
                 socket = UNBOUNDED;
             }
@@ -108,32 +130,28 @@ public class Server {
         }
     }
 
-    private ThreadTask createThreadTask(Socket socket, AbstractMessageFactory mainThreadMessageFactory, AbstractMessageFactory workerThreadMessageFactory) throws IOException {
-        String hostAddress = socket.getInetAddress().getHostAddress();
-        ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
+    private Socket getSocket() throws IOException {
+        log.info("waiting.. request");
+        Socket socket = serverSocket.accept();
+        log.info("accept.. request");
 
-        Function<AbstractMessageFactory, Runnable> runnableCreator = getRunnableCreator(socket, hostAddress, resourcePath);
-
-        if (mainThreadMessageFactory.isSupported(resourcePath)) {
-            return new ThreadTask(ThreadTaskType.MAIN, runnableCreator.apply(mainThreadMessageFactory));
-        }
-
-        return new ThreadTask(ThreadTaskType.THREAD, runnableCreator.apply(workerThreadMessageFactory));
+        return socket;
     }
 
     @NotNull
-    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, String hostAddress, ResourcePath resourcePath) {
+    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, ResourcePath resourcePath) {
         return (messageFactory) -> {
             Message message = messageFactory.createMessage(resourcePath);
 
-            if (message instanceof FileMessage) {
-                return () -> {
-                    recordDownloadTime(hostAddress);
-                    sendMessage(socket, message);
-                };
-            }
-
             return () -> sendMessage(socket, message);
+        };
+    }
+
+    private Function<PreTask, Runnable> createMessagePreTaskCreator(ResourcePath resourcePath) {
+        return preTask -> () -> {
+            if (preTask.isWorkablePreTaskRequest(resourcePath)) {
+                preTask.doWork(resourcePath);
+            }
         };
     }
 }

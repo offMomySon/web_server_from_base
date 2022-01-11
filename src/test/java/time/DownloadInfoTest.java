@@ -4,7 +4,6 @@ import config.ConfigManager;
 import config.server.download.DownloadInfoRestrictChecker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -18,13 +17,13 @@ class DownloadInfoTest {
         DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
 
         for (int i = 0; i < 10; i++) {
-            if (!downloadInfoRestrictChecker.isRestrictedRate(ip)) {
-                downloadInfoRestrictChecker.increaseCount(ip);
+            if (!downloadInfoRestrictChecker.isRestrictedCount(ip)) {
+//                downloadInfoRestrictChecker.increaseCount(ip);
             }
         }
 
         //when
-        boolean actual = downloadInfoRestrictChecker.isRestrictedRate(ip);
+        boolean actual = downloadInfoRestrictChecker.isRestrictedCount(ip);
 
         //then
         Assertions.assertThat(actual).isFalse();
@@ -38,7 +37,7 @@ class DownloadInfoTest {
         DownloadInfoRestrictChecker downloadInfoRestrictChecker = ConfigManager.getInstance().getDownloadConfig().getDownloadInfoRestrictChecker();
 
         //when
-        boolean actual = downloadInfoRestrictChecker.isRestrictedRate(ip);
+        boolean actual = downloadInfoRestrictChecker.isRestrictedCount(ip);
 
         //then
         Assertions.assertThat(actual).isTrue();
