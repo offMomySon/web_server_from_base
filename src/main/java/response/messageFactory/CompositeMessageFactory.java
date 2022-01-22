@@ -1,6 +1,5 @@
 package response.messageFactory;
 
-import domain.ResourcePath;
 import lombok.NonNull;
 import response.message.sender.Message;
 
@@ -15,16 +14,16 @@ public class CompositeMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
+    public Message createMessage() {
         return factories.stream()
-                .filter(factory -> factory.isSupported(resourcePath))
+                .filter(AbstractMessageFactory::isSupported)
                 .findFirst()
-                .map(factory -> factory.createMessage(resourcePath))
-                .orElseThrow(() -> new RuntimeException("resourcePath = " + resourcePath));
+                .map(AbstractMessageFactory::createMessage)
+                .orElseThrow();
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
-        return factories.stream().anyMatch(factory -> factory.isSupported(resourcePath));
+    public boolean isSupported() {
+        return true;
     }
 }

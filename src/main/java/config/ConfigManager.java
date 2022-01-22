@@ -3,7 +3,7 @@ package config;
 import config.server.BasicConfig;
 import config.server.download.data.DownloadConfig;
 import config.server.thread.ThreadConfig;
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,8 +31,8 @@ public class ConfigManager {
                 .build();
     }
 
-    public boolean isWelcomePage(ResourcePath resourcePath) {
-        return basicConfig.isWelcomePage(resourcePath);
+    public boolean isWelcomePage(ResourceMessageCreator resourceMessageCreator) {
+        return basicConfig.isWelcomePage(resourceMessageCreator);
     }
 }
 

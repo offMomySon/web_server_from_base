@@ -1,6 +1,6 @@
 package reader.httpspec.startLine;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,10 +10,10 @@ import java.io.IOException;
 @Getter
 @Slf4j
 public class HttpStartLine {
-    public static final ResourcePath EMPTY_REQUEST_TARGET = ResourcePath.create("");
+    public static final ResourceMessageCreator EMPTY_REQUEST_TARGET = ResourceMessageCreator.create("");
 
     private final HttpMethod httpMethod;
-    private final ResourcePath resourcePath;
+    private final ResourceMessageCreator resourceMessageCreator;
     private final String httpVersion;
 
     public HttpStartLine(BufferedReader reader) {
@@ -24,11 +24,11 @@ public class HttpStartLine {
 
             String[] splitedStartLine = startLine.split(" ");
             httpMethod = HttpMethod.valueOf(splitedStartLine[0].trim());
-            resourcePath = ResourcePath.create(splitedStartLine[1].trim());
+            resourceMessageCreator = ResourceMessageCreator.create(splitedStartLine[1].trim());
             httpVersion = splitedStartLine[2].trim();
 
             log.debug("HttpMethod : " + httpMethod);
-            log.debug("RequestTarget : " + resourcePath);
+            log.debug("RequestTarget : " + resourceMessageCreator);
             log.debug("HttpVersion : " + httpVersion);
         } catch (IOException e) {
             throw new RuntimeException(e);

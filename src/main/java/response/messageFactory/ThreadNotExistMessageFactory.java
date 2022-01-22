@@ -1,6 +1,5 @@
 package response.messageFactory;
 
-import domain.ResourcePath;
 import lombok.NonNull;
 import response.message.content.SimpleMessage;
 import response.message.sender.Message;
@@ -16,12 +15,12 @@ public class ThreadNotExistMessageFactory implements AbstractMessageFactory {
     }
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
+    public Message createMessage() {
         return new SimpleMessage(NOT_AVAILABLE_THREAD);
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
+    public boolean isSupported() {
         return !statusSnapShot.isAvailable();
     }
 }

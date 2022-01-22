@@ -1,6 +1,6 @@
 import action.*;
 import config.ConfigManager;
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import reader.httpspec.HttpRequest;
@@ -75,22 +75,17 @@ public class Server {
         //TODO 어셈블러 장점 이해하기
         ThreadTasker threadTasker = new ThreadTasker();
 
-        WelcomeMessageFactory welcomeMessageFactory = new WelcomeMessageFactory();
-        DirectoryMessageFactory directoryMessageFactory = new DirectoryMessageFactory();
-        Function<String, AbstractMessageFactory> mainThreadFactoryCreator = (hostAddress) -> new CompositeMessageFactory(List.of(
-                welcomeMessageFactory,
-                directoryMessageFactory,
-                new FilteredMessageFactory(hostAddress),
+        BiFunction<String, ResourceMessageCreator, AbstractMessageFactory> mainThreadFactoryCreator = (hostAddress, resourcePath) -> new CompositeMessageFactory(List.of(
+                new FilteredMessageFactory(hostAddress, resourcePath.createFileExtension()),
                 new ThreadNotExistMessageFactory(threadTasker.createStatusSnapShot()),
                 new ExceedDownloadCountMessageFactory(hostAddress)
         ));
 
-        FileMessageFactory fileMessageFactory = new FileMessageFactory();
-        AbstractMessageFactory workerThreadMessageFactory = new CompositeMessageFactory(List.of(
-                fileMessageFactory
+        Function<ResourceMessageCreator, AbstractMessageFactory> workerThreadMessageFactoryCreator = (resourcePath) -> new CompositeMessageFactory(List.of(
+                ResourceMessageFactory.create(resourcePath)
         ));
 
-        BiFunction<String, ResourcePath, PreTask> preTaskCreator = (hostAddress, resourcePath) -> new CompositedPreTask(List.of(
+        BiFunction<String, ResourceMessageCreator, PreTask> preTaskCreator = (hostAddress, resourcePath) -> new CompositedPreTask(List.of(
                 RestrictPreTask.create(hostAddress, resourcePath.createFileExtension())
         ));
 
@@ -112,7 +107,7 @@ public class Server {
                 // TODO 구조를 이해했으면, 그 구조가 코드로 표현할 수 있게 다듬기 (위 구조를 잡았으면 위 구조대로 해석할 수 있게 코드로 표현하기
                 // TODO 아래코드는 구조는 잡혔으나 시스템 표현이 안좋다. 그렇기에 뭉탱이로 처리할것들을 처리하여 위 구조가 '잘' 드러나도록 코드를 리팩토링하기
                 // TODO 이 과정에서 특정 class 파일이 나올것이다. 해당 파일의 역할을 생각하여 구조를 다듬어 보자.
-                ResourcePath resourcePath = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourcePath();
+                ResourceMessageCreator resourceMessageCreator = new HttpRequest(socket.getInputStream()).getHttpStartLine().getResourceMessageCreator();
 //
 ////                Function<PreTask, Runnable> messagePreTaskCreator = createMessagePreTaskCreator(resourcePath);
 //                Function<AbstractMessageFactory, Runnable> messageHandlerCreator = getRunnableCreator(socket, resourcePath);
@@ -125,15 +120,14 @@ public class Server {
 //                threadTasker.run(buildThreadTask(taskType, messagePreTaskCreator, preTask, messageHandlerCreator, targetFactory));
 
                 TaskCreator taskCreator = TaskCreator.create(socket, hostAddress,
-                        preTaskCreator.apply(hostAddress, resourcePath),
-                        resourcePath,
-                        mainThreadFactoryCreator.apply(hostAddress),
-                        workerThreadMessageFactory,
+                        preTaskCreator.apply(hostAddress, resourceMessageCreator),
+                        resourceMessageCreator,
+                        mainThreadFactoryCreator.apply(hostAddress, resourceMessageCreator),
+                        workerThreadMessageFactoryCreator.apply(resourceMessageCreator),
                         actionCreator);
 
                 ThreadTask threadTask = taskCreator.create();
                 threadTasker.run(threadTask);
-
 
                 socket = UNBOUNDED;
             }
@@ -159,9 +153,9 @@ public class Server {
     }
 
     @NotNull
-    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, ResourcePath resourcePath) {
+    private Function<AbstractMessageFactory, Runnable> getRunnableCreator(Socket socket, ResourceMessageCreator resourceMessageCreator) {
         return (messageFactory) -> {
-            Message message = messageFactory.createMessage(resourcePath);
+            Message message = messageFactory.createMessage();
 
             return () -> Server.sendMessage(socket, message);
         };

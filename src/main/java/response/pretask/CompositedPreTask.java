@@ -1,6 +1,6 @@
 package response.pretask;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 
 import java.util.Collections;
@@ -14,15 +14,15 @@ public class CompositedPreTask implements PreTask {
     }
 
     @Override
-    public void doWork(ResourcePath resourcePath) {
+    public void doWork(ResourceMessageCreator resourceMessageCreator) {
         preTasks.stream()
-                .filter(preTask -> preTask.isWorkablePreTaskRequest(resourcePath))
+                .filter(preTask -> preTask.isWorkablePreTaskRequest(resourceMessageCreator))
                 .findFirst()
-                .ifPresent(preTask -> preTask.doWork(resourcePath));
+                .ifPresent(preTask -> preTask.doWork(resourceMessageCreator));
     }
 
     @Override
-    public boolean isWorkablePreTaskRequest(ResourcePath resourcePath) {
+    public boolean isWorkablePreTaskRequest(ResourceMessageCreator resourceMessageCreator) {
         return true;
     }
 }

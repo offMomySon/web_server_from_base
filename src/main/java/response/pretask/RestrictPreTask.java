@@ -3,7 +3,6 @@ package response.pretask;
 import config.ConfigManager;
 import config.server.download.DownloadInfoRestrictChecker;
 import domain.FileExtension;
-import domain.ResourcePath;
 import lombok.NonNull;
 
 public class RestrictPreTask extends FileRequestPreTask {

@@ -1,8 +1,8 @@
 package action;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 
 public interface ActionCreator {
-    Runnable get(@NonNull ResourcePath resourcePath);
+    Runnable get(@NonNull ResourceMessageCreator resourceMessageCreator);
 }

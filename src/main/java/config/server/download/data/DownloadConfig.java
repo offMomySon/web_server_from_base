@@ -6,7 +6,7 @@ import config.server.Config;
 import config.server.download.DownloadInfoRepository;
 import config.server.download.DownloadInfoRestrictChecker;
 import domain.FileExtension;
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -58,12 +58,12 @@ public class DownloadConfig {
         return downloadPath;
     }
 
-    public ResourcePath getRootPath() {
-        return ResourcePath.create(getDownloadPath());
+    public ResourceMessageCreator getRootPath() {
+        return ResourceMessageCreator.create(getDownloadPath());
     }
 
-    public ResourcePath getResourcePath(ResourcePath resourcePath) {
-        return getRootPath().append(resourcePath);
+    public ResourceMessageCreator getResourcePath(ResourceMessageCreator resourceMessageCreator) {
+        return getRootPath().append(resourceMessageCreator);
     }
 
 }

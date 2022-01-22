@@ -2,7 +2,7 @@ package config.server;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.Getter;
 
 @Getter
@@ -10,10 +10,10 @@ public class BasicConfig {
     private static final String BASIC_CONFIG_PATH = "src/main/resources/config/basic_setting.json";
 
     private final int port;
-    private final ResourcePath welcomePageURI;
+    private final ResourceMessageCreator welcomePageURI;
 
     @JsonCreator
-    public BasicConfig(@JsonProperty("port") int port, @JsonProperty("welcomePagePath") ResourcePath welcomePageURI) {
+    public BasicConfig(@JsonProperty("port") int port, @JsonProperty("welcomePagePath") ResourceMessageCreator welcomePageURI) {
         this.port = port;
         this.welcomePageURI = welcomePageURI;
     }
@@ -23,7 +23,7 @@ public class BasicConfig {
         return basicConfig;
     }
 
-    public boolean isWelcomePage(ResourcePath resourcePath) {
-        return welcomePageURI.equals(resourcePath);
+    public boolean isWelcomePage(ResourceMessageCreator resourceMessageCreator) {
+        return welcomePageURI.equals(resourceMessageCreator);
     }
 }

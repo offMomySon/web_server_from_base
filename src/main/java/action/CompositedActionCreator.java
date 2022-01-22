@@ -1,6 +1,6 @@
 package action;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 
 import java.util.Collections;
@@ -14,7 +14,7 @@ public class CompositedActionCreator implements ActionCreator {
     }
 
     @Override
-    public Runnable get(@NonNull ResourcePath resourcePath) {
+    public Runnable get(@NonNull ResourceMessageCreator resourceMessageCreator) {
         Runnable newRunner = () -> {
         };
 
@@ -23,7 +23,7 @@ public class CompositedActionCreator implements ActionCreator {
 
             newRunner = () -> {
                 _originRunner.run();
-                actionCreator.get(resourcePath).run();
+                actionCreator.get(resourceMessageCreator).run();
             };
         }
 

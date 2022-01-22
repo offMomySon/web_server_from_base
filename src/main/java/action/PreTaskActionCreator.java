@@ -1,6 +1,6 @@
 package action;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 import response.pretask.PreTask;
 
@@ -11,16 +11,16 @@ public class PreTaskActionCreator implements ActionCreator {
         this.preTask = preTask;
     }
 
-    public Runnable get(@NonNull ResourcePath resourcePath, @NonNull PreTask preTask) {
+    public Runnable get(@NonNull ResourceMessageCreator resourceMessageCreator, @NonNull PreTask preTask) {
         return () -> {
-            if (preTask.isWorkablePreTaskRequest(resourcePath)) {
-                preTask.doWork(resourcePath);
+            if (preTask.isWorkablePreTaskRequest(resourceMessageCreator)) {
+                preTask.doWork(resourceMessageCreator);
             }
         };
     }
 
     @Override
-    public Runnable get(@NonNull ResourcePath resourcePath) {
-        return get(resourcePath, preTask);
+    public Runnable get(@NonNull ResourceMessageCreator resourceMessageCreator) {
+        return get(resourceMessageCreator, preTask);
     }
 }

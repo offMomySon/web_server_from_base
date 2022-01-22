@@ -1,6 +1,5 @@
 package response.messageFactory;
 
-import domain.ResourcePath;
 import lombok.NonNull;
 import response.message.sender.Message;
 
@@ -11,17 +10,17 @@ public abstract class AbstractHostAddressMessageFactory implements AbstractMessa
         this.hostAddress = hostAddress;
     }
 
-    public abstract Message createMessage(@NonNull String hostAddress, @NonNull ResourcePath resourcePath);
+    public abstract Message createMessage(@NonNull String hostAddress);
 
-    public abstract boolean isSupported(@NonNull String hostAddress, @NonNull ResourcePath resourcePath);
+    public abstract boolean isSupported(@NonNull String hostAddress);
 
     @Override
-    public Message createMessage(ResourcePath resourcePath) {
-        return createMessage(hostAddress, resourcePath);
+    public Message createMessage() {
+        return createMessage(hostAddress);
     }
 
     @Override
-    public boolean isSupported(ResourcePath resourcePath) {
-        return isSupported(hostAddress, resourcePath);
+    public boolean isSupported() {
+        return isSupported(hostAddress);
     }
 }

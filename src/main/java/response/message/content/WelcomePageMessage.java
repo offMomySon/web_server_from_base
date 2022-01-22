@@ -10,11 +10,6 @@ import response.message.sender.Message;
 
 @Slf4j
 public class WelcomePageMessage extends Message {
-    private final ConfigManager configManager;
-
-    public WelcomePageMessage(@NonNull ConfigManager configManager) {
-        this.configManager = configManager;
-    }
 
     @Override
     protected String getContentType() {
@@ -24,6 +19,7 @@ public class WelcomePageMessage extends Message {
     @Override
     protected String getContent() {
         log.info("Start to response welcome, config");
+        ConfigManager configManager = ConfigManager.getInstance();
 
         ThreadConfig threadConfig = configManager.getThreadConfig();
         BasicConfig basicConfig = configManager.getBasicConfig();

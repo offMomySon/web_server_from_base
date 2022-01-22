@@ -1,6 +1,6 @@
 package action;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 import response.message.sender.Message;
 import response.messageFactory.AbstractMessageFactory;
@@ -17,8 +17,8 @@ public class MainTaskActionCreator implements ActionCreator {
     }
 
     @Override
-    public Runnable get(@NonNull ResourcePath resourcePath) {
-        Message message = targetMessageFactory.createMessage(resourcePath);
+    public Runnable get(@NonNull ResourceMessageCreator resourceMessageCreator) {
+        Message message = targetMessageFactory.createMessage();
 
         return messageHandler.apply(message);
     }

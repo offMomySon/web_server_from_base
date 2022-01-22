@@ -1,10 +1,10 @@
 package response.pretask;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 
 public interface PreTask {
 
-    void doWork(ResourcePath resourcePath);
+    void doWork(ResourceMessageCreator resourceMessageCreator);
 
-    boolean isWorkablePreTaskRequest(ResourcePath resourcePath);
+    boolean isWorkablePreTaskRequest(ResourceMessageCreator resourceMessageCreator);
 }

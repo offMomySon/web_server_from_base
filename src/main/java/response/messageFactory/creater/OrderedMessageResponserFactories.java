@@ -13,7 +13,7 @@ public class OrderedMessageResponserFactories {
                 new ThreadNotExistMessageFactory(statusSnapShot),
                 new WelcomeMessageFactory(),
                 new DirectoryMessageFactory(),
-                new FilteredMessageFactory(hostAddress),
+                new FilteredMessageFactory(hostAddress, fileExtension),
                 new FileMessageFactory());
     }
 

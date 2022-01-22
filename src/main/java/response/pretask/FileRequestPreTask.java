@@ -1,6 +1,6 @@
 package response.pretask;
 
-import domain.ResourcePath;
+import domain.ResourceMessageCreator;
 import lombok.NonNull;
 
 public class FileRequestPreTask implements PreTask {
@@ -11,12 +11,12 @@ public class FileRequestPreTask implements PreTask {
     }
 
     @Override
-    public boolean isWorkablePreTaskRequest(ResourcePath resourcePath) {
-        return resourcePath.isFile();
+    public boolean isWorkablePreTaskRequest(ResourceMessageCreator resourceMessageCreator) {
+        return true;
     }
 
     @Override
-    public void doWork(ResourcePath resourcePath) {
+    public void doWork(ResourceMessageCreator resourceMessageCreator) {
         task.run();
     }
 }
