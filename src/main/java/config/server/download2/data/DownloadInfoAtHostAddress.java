@@ -1,4 +1,4 @@
-package config.server.download2;
+package config.server.download2.data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,7 +6,6 @@ import domain.FileExtension;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
 import java.util.Set;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class DownloadInfoAtHostAddress {
                                      @JsonProperty("restrictedFileExtension") Set<FileExtension> restrictedFileExtensions) {
         this.ip = ip;
         this.downloadRate = downloadRate;
-        this.restrictedFileExtensions = Collections.unmodifiableSet(restrictedFileExtensions);
+        this.restrictedFileExtensions = restrictedFileExtensions;
 
         log.info("Ip = {}", ip);
         log.info("downloadRate = {}", downloadRate);

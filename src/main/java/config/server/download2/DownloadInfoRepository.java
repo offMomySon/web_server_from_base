@@ -1,5 +1,7 @@
 package config.server.download2;
 
+import config.server.download2.data.DownloadInfoAtHostAddress;
+import config.server.download2.data.DownloadRate2;
 import domain.FileExtension;
 import lombok.NonNull;
 
@@ -8,7 +10,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class DownloadInfoRepository implements DownloadInfoFinder {
+public class DownloadInfoRepository {
     private final Map<String, DownloadInfoAtHostAddress> values;
     private final DownloadInfoAtHostAddress commonHostAddress;
 
@@ -28,7 +30,6 @@ public class DownloadInfoRepository implements DownloadInfoFinder {
         return new DownloadInfoRepository(newValues, DownloadInfoAtHostAddress.allMatched(downloadRate, restrictedFileExtensions));
     }
 
-    @Override
     public DownloadInfoAtHostAddress find(String ip) {
         return values.getOrDefault(ip, commonHostAddress);
     }

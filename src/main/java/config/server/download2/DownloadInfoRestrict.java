@@ -1,5 +1,7 @@
 package config.server.download2;
 
+import config.server.download2.data.DownloadInfoAtHostAddress;
+import config.server.download2.data.DownloadRate2;
 import domain.FileExtension;
 import lombok.NonNull;
 

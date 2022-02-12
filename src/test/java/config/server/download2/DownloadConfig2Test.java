@@ -1,5 +1,6 @@
 package config.server.download2;
 
+import config.server.download2.data.DownloadConfig2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,7 @@ class DownloadConfig2Test {
         //given
         //when
 //        DownloadConfig2 downloadConfig = DownloadConfig2.ofJackson();
+        DownloadConfig2 downloadConfig = DownloadConfig2.create();
 
         //thenR
     }

@@ -1,5 +1,6 @@
 package config.server.download2;
 
+import config.server.download2.data.DownloadInfoAtHostAddress;
 import lombok.NonNull;
 
 import java.util.Collections;

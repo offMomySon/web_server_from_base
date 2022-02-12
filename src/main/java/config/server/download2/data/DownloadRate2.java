@@ -1,4 +1,4 @@
-package config.server.download2;
+package config.server.download2.data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
